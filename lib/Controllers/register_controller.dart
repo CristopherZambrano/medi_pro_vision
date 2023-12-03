@@ -32,7 +32,45 @@ Future<HttpBaseResponse> registerPatient(
       final decodedData = jsonDecode(response.body);
       return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
     } else {
-      return HttpBaseResponse(code: 400, data: null);
+      return HttpBaseResponse(code: 500, data: null);
+    }
+  } on Exception {
+    return HttpBaseResponse(code: 400, data: null);
+  }
+}
+
+Future<HttpBaseResponse> registerDoctor(
+  String name,
+  String lastName,
+  String email,
+  String password,
+  String birthday,
+  String phone,
+  String gender,
+  String idNumber,
+  String address,
+  String speciality,
+  String description,
+) async {
+  try {
+    final response = await api.post('/registerDoctor', {
+      'name': name,
+      'lastName': lastName,
+      'birthday': birthday,
+      'gender': gender,
+      'cellPhone': phone,
+      'email': email,
+      'password': password,
+      'address': address,
+      'idNumber': idNumber,
+      'speciality': speciality,
+      'description': description,
+    });
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body);
+      return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
+    } else {
+      return HttpBaseResponse(code: 500, data: null);
     }
   } on Exception {
     return HttpBaseResponse(code: 400, data: null);

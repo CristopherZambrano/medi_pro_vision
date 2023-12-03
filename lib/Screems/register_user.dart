@@ -40,6 +40,25 @@ class _FormRegisterState extends State<FormRegister> {
   Future<bool> regiPatient() async {
     bool register = false;
     final response = await registerPatient(
+      nameController.text,
+      lastNameController.text,
+      emailController.text,
+      passwordController.text,
+      birthdayController.text,
+      cellPhoneController.text,
+      genderController.text,
+      idNumberController.text,
+      addresController.text,
+    );
+    if (response.code == 1) {
+      register = true;
+    }
+    return register;
+  }
+
+  Future<bool> regiDoctor() async {
+    bool register = false;
+    final response = await registerDoctor(
         nameController.text,
         lastNameController.text,
         emailController.text,
@@ -48,7 +67,9 @@ class _FormRegisterState extends State<FormRegister> {
         cellPhoneController.text,
         genderController.text,
         idNumberController.text,
-        addresController.text);
+        addresController.text,
+        specialityController.text,
+        descriptionController.text);
     if (response.code == 1) {
       register = true;
     }
@@ -254,7 +275,14 @@ class _FormRegisterState extends State<FormRegister> {
                         style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () {
-                        if (_doctorKey.currentState!.validate()) {}
+                        if (_doctorKey.currentState!.validate()) {
+                          regiDoctor().then((value) {
+                            if (value == true) {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const LogIn()));
+                            }
+                          });
+                        }
                       },
                     ),
                   )

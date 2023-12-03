@@ -13,7 +13,8 @@ Widget primaryTitle(String title) {
   );
 }
 
-Widget listTab(String title, String description, String iconTab) {
+Widget listTab(String title, String description, String iconTab,
+    {required VoidCallback onTap}) {
   return Container(
     height: 110,
     decoration: BoxDecoration(
@@ -58,6 +59,9 @@ Widget listTab(String title, String description, String iconTab) {
           ),
         ],
       ),
+      onTap: () {
+        onTap();
+      },
     ),
   );
 }

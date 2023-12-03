@@ -14,9 +14,9 @@ Future<HttpBaseResponse> checkCredencials(String user, String password) async {
       final decodedData = jsonDecode(response.body);
       return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
     } else {
-      return HttpBaseResponse(code: 400, data: null);
+      return HttpBaseResponse(code: 500, data: null);
     }
-  } on Exception{
+  } on Exception {
     return HttpBaseResponse(code: 400, data: null);
   }
 }
