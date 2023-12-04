@@ -8,10 +8,10 @@ class HttpBaseResponse {
   });
 
   factory HttpBaseResponse.fromJson(Map<String, dynamic> json) =>
-      HttpBaseResponse(code: json['code'], data: json['Detalle']);
+      HttpBaseResponse(code: json['code'], data: json['data']);
 
   Map<String, dynamic> toJson() => {
         'code': code,
-        'detalle': data.toJson(),
+        'data': data.toJson(),
       };
 }

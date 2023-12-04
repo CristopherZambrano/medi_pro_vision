@@ -84,7 +84,7 @@ class _LogInScreemState extends State<LogInScreem> {
                             _isButtonDisabled = false;
                             _textButton = 'Please wait';
                           }),
-                          initSession(),
+                          initSession(context),
                           setState(() {
                             _isButtonDisabled = true;
                             _textButton = 'Get into';
@@ -104,16 +104,16 @@ class _LogInScreemState extends State<LogInScreem> {
     );
   }
 
-  void initSession() {
+  void initSession(BuildContext context) {
     checkUser().then((checkUserResult) {
       if (checkUserResult == true) {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => const Home()));
       } else {
-        showDialogAlert('Wrong', 'Incorrect credentials');
+        showDialogAlert(context, 'Wrong', 'Incorrect credentials');
       }
     }).catchError((error) {
-      showDialogAlert('Wrong', error.toString());
+      showDialogAlert(context, 'Wrong', error.toString());
     });
   }
 

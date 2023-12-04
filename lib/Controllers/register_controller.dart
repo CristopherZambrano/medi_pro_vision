@@ -28,6 +28,7 @@ Future<HttpBaseResponse> registerPatient(
       'address': address,
       'idNumber': idNumber,
     });
+    print(response.statusCode);
     if (response.statusCode == 200) {
       final decodedData = jsonDecode(response.body);
       return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);

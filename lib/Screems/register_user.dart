@@ -36,6 +36,7 @@ class _FormRegisterState extends State<FormRegister> {
   TextEditingController idNumberController = TextEditingController();
   TextEditingController specialityController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  String message = '';
 
   Future<bool> regiPatient() async {
     bool register = false;
@@ -53,6 +54,7 @@ class _FormRegisterState extends State<FormRegister> {
     if (response.code == 1) {
       register = true;
     }
+    message = response.data;
     return register;
   }
 
@@ -73,6 +75,7 @@ class _FormRegisterState extends State<FormRegister> {
     if (response.code == 1) {
       register = true;
     }
+    message = response.data;
     return register;
   }
 
@@ -175,8 +178,16 @@ class _FormRegisterState extends State<FormRegister> {
                         if (_patientKey.currentState!.validate()) {
                           regiPatient().then((value) {
                             if (value == true) {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const LogIn()));
+                              showDialogAlertAndRedirection(
+                                  context, 'Registered patient', message,
+                                  onPressed: () => {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const LogIn()))
+                                      });
+                            } else {
+                              showDialogAlert(context, 'Mistake', message);
                             }
                           });
                         }
@@ -278,8 +289,16 @@ class _FormRegisterState extends State<FormRegister> {
                         if (_doctorKey.currentState!.validate()) {
                           regiDoctor().then((value) {
                             if (value == true) {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const LogIn()));
+                              showDialogAlertAndRedirection(
+                                  context, 'Registered doctor', message,
+                                  onPressed: () => {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const LogIn()))
+                                      });
+                            } else {
+                              showDialogAlert(context, 'Mistake', message);
                             }
                           });
                         }
