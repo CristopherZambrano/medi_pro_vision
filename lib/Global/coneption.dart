@@ -1,3 +1,3 @@
 class ApiConsume {
-  static const String urlApi = 'https://71ea-187-61-93-137.ngrok.io/api';
+  static const String urlApi = 'https://b40f-185-181-33-218.ngrok-free.app/api';
 }

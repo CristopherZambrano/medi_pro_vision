@@ -26,6 +26,7 @@ class LogInScreem extends StatefulWidget {
 class _LogInScreemState extends State<LogInScreem> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  String message = '';
   late bool _isButtonDisabled;
   String _textButton = 'Get into';
 
@@ -110,7 +111,7 @@ class _LogInScreemState extends State<LogInScreem> {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => const Home()));
       } else {
-        showDialogAlert(context, 'Wrong', 'Incorrect credentials');
+        showDialogAlert(context, 'Wrong', message);
       }
     }).catchError((error) {
       showDialogAlert(context, 'Wrong', error.toString());
@@ -122,11 +123,13 @@ class _LogInScreemState extends State<LogInScreem> {
     bool isAuth = false;
     final response =
         await checkCredencials(userController.text, passwordController.text);
-    if (response.code == 200) {
+    print(response.code);
+    if (response.code == 1) {
       isAuth = true;
-      prefs.setString('Data', response.data.toString());
+      message = response.message;
+      prefs.setString('User', response.data.toString());
     }
-    if (response.code == 400) {
+    if (response.code == 2) {
       isAuth = false;
     }
     return isAuth;

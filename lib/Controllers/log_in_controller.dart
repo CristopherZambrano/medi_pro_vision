@@ -14,9 +14,11 @@ Future<HttpBaseResponse> checkCredencials(String user, String password) async {
       final decodedData = jsonDecode(response.body);
       return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
     } else {
-      return HttpBaseResponse(code: 500, data: null);
+      return HttpBaseResponse(
+          code: 500, message: "Error de conexión", data: null);
     }
   } on Exception {
-    return HttpBaseResponse(code: 400, data: null);
+    return HttpBaseResponse(
+        code: 400, message: "Error de conexión", data: null);
   }
 }

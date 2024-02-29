@@ -54,7 +54,7 @@ class _FormRegisterState extends State<FormRegister> {
     if (response.code == 1) {
       register = true;
     }
-    message = response.data;
+    message = response.message;
     return register;
   }
 
@@ -75,7 +75,7 @@ class _FormRegisterState extends State<FormRegister> {
     if (response.code == 1) {
       register = true;
     }
-    message = response.data;
+    message = response.message;
     return register;
   }
 
