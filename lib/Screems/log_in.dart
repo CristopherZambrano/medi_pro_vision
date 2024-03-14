@@ -123,11 +123,11 @@ class _LogInScreemState extends State<LogInScreem> {
     bool isAuth = false;
     final response =
         await checkCredencials(userController.text, passwordController.text);
-    print(response.code);
     if (response.code == 1) {
       isAuth = true;
       message = response.message;
       prefs.setString('User', response.data.toString());
+      print(response.data.toString());
     }
     if (response.code == 2) {
       isAuth = false;

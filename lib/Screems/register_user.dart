@@ -105,7 +105,7 @@ class _FormRegisterState extends State<FormRegister> {
               child: Column(
                 children: [
                   Center(
-                    child: primaryTitle('Paciente'),
+                    child: primaryTitle('Patient'),
                   ),
                   formText(
                       'Please, enter your name here',
@@ -204,7 +204,7 @@ class _FormRegisterState extends State<FormRegister> {
               child: Column(
                 children: [
                   Center(
-                    child: primaryTitle('Paciente'),
+                    child: primaryTitle('Doctor'),
                   ),
                   formText(
                       'Please, enter your name here',

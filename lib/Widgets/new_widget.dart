@@ -8,7 +8,7 @@ Widget primaryTitle(String title) {
       fontSize: 28.0,
       fontFamily: "Roboto",
       fontStyle: FontStyle.italic,
-      color: Color.fromARGB(238, 11, 253, 3),
+      color: Colors.black,
     ),
   );
 }
@@ -20,7 +20,7 @@ Widget listTab(String title, String description, String iconTab,
     decoration: BoxDecoration(
         border: Border.all(color: Colors.black12, width: 2),
         borderRadius: BorderRadius.circular(20),
-        color: Colors.white,
+        color: Colors.grey[200],
         boxShadow: const [
           BoxShadow(color: Colors.black, blurRadius: 6),
         ]),

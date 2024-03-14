@@ -25,7 +25,7 @@ class _ProfileScreemState extends State<ProfileScreem> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: primaryTitle('Perfil'),
+        child: primaryTitle('Profile'),
       ),
     );
   }
