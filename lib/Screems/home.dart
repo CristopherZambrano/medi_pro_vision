@@ -63,15 +63,15 @@ class HomePage extends StatelessWidget {
                 int? tipeUser = prefs.getInt("TipeUser");
                 print(tipeUser);
 
-                if (tipeUser == 1) {
+                if (tipeUser == 2) {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => const Profile()));
                 } else {
-                  if (tipeUser == 2) {
+                  if (tipeUser == 1) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const diagnostico()));
+                            builder: (context) => const Diagnostico()));
                   }
                 }
               },
