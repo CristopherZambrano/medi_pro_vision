@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:medi_pro_vision/Screems/Diagnosticos.dart';
-import 'package:medi_pro_vision/Screems/HistorialPatient.dart';
 import 'package:medi_pro_vision/Screems/log_in.dart';
 import 'package:medi_pro_vision/Screems/register_user.dart';
 
 void main() {
-  runApp(History());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
