@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Screems/Resultado.dart';
 
 class Questionary extends StatelessWidget {
   Map<String, Color> customTheme = {
@@ -43,21 +44,39 @@ class QuestionnaireScreen extends StatefulWidget {
 }
 
 class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
+  TextEditingController numericText = TextEditingController();
   int currentQuestionIndex = 0;
+  List<int> answer = [];
   final List<String> questions = [
-    'Do you like Flutter?', // Yes or No
-    'How many hours do you code daily?', // Numeric
-    // Add more questions as per your requirements here...
-    // Ensure that there are 15 questions as specified
+    'Have you had an increase in thirst lately?', // Yes or No
+    'Do you go to the bathroom more frequently?',
+    'Have you ever felt tired or fatigued?',
+    'Have you lost weight lately?',
+    'Have you ever seen blurry?',
+    'Do your wounds take time to heal?',
+    'Has your appetite increased lately?',
+    'Have you had genital infections in the last semester?',
+    'Have you felt an inexplicable body itch?',
+    'Have you had sudden mood changes?',
+    'Have you felt tingling in your extremities?',
+    'Have you had cramps lately?',
+    'Have you noticed your hair falling out?',
+    'Are your parents diabetic?',
+    'Do you have siblings with diabetes?',
+    'Do you have children with diabetes?'
   ];
 
-  void _nextQuestion() {
+  void _nextQuestion(int? resp) {
+    if (resp != null) {
+      answer.add(resp);
+    }
     if (currentQuestionIndex < questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
       });
     } else {
-      // Logic when all questions are answered
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Resultado()));
     }
   }
 
@@ -79,16 +98,16 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                 ),
               ),
             ),
-            if (currentQuestionIndex % 2 == 0)
+            if (currentQuestionIndex < 13)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   ElevatedButton(
-                    onPressed: _nextQuestion,
+                    onPressed: () => _nextQuestion(1),
                     child: const Text('Yes'),
                   ),
                   ElevatedButton(
-                    onPressed: _nextQuestion,
+                    onPressed: () => _nextQuestion(0),
                     child: const Text('No'),
                   ),
                 ],
@@ -97,8 +116,10 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50.0),
                 child: TextFormField(
+                  controller: numericText,
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (_) => _nextQuestion(),
+                  onFieldSubmitted: (_) =>
+                      _nextQuestion(int.tryParse(numericText.text)),
                   decoration: const InputDecoration(
                     labelText: 'Enter value',
                     hintText: 'Numeric value',

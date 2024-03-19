@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
+import 'package:medi_pro_vision/Models/user1.dart';
+import 'package:medi_pro_vision/Screems/Questionary.dart';
 
 class Diagnostico extends StatelessWidget {
   const Diagnostico({super.key});
@@ -27,35 +30,52 @@ class DiagnosticoScreem extends StatefulWidget {
 }
 
 class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
+  bool isPatient = false;
   final TextEditingController _searchController = TextEditingController();
-  Patient? _foundPatient;
+  User? _foundPatient;
 
-  final Map<String, Patient> _patientsDatabase = {
-    "12345678": Patient(
-        id: "12345678",
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@example.com",
-        age: 30),
-    "87654321": Patient(
-        id: "87654321",
-        firstName: "Jane",
-        lastName: "Doe",
-        email: "jane.doe@example.com",
-        age: 28),
-    // Add more patients here
-  };
+  User parseUserString(String userString) {
+    List<String> parts = userString.split(', ');
+    int id = int.parse(parts[0].substring(parts[0].indexOf('=') + 1));
+    String nombre = parts[1].substring(parts[1].indexOf('=') + 1);
+    String apellido = parts[2].substring(parts[2].indexOf('=') + 1);
+    String email = parts[3].substring(parts[3].indexOf('=') + 1);
+    String fechaNacimiento = parts[4].substring(parts[4].indexOf('=') + 1);
+    String password = parts[5].substring(parts[5].indexOf('=') + 1);
+    String genero = parts[6].substring(parts[6].indexOf('=') + 1);
+    String direccion = parts[7].substring(parts[7].indexOf('=') + 1);
+    String celular = parts[8].substring(parts[8].indexOf('=') + 1);
+    String documento =
+        parts[9].substring(parts[9].indexOf('=') + 1, parts[9].length - 1);
 
-  void _search() {
+    return User(
+      id: id,
+      nombre: nombre,
+      apellido: apellido,
+      email: email,
+      fechaNacimiento: fechaNacimiento,
+      password: password,
+      genero: genero,
+      direccion: direccion,
+      celular: celular,
+      documento: documento,
+    );
+  }
+
+  void _search() async {
     final id = _searchController.text;
-    if (_patientsDatabase.containsKey(id)) {
+    final response = await buscarPaciente(id);
+    if (response.code == 1) {
       setState(() {
-        _foundPatient = _patientsDatabase[id];
+        User user = parseUserString(response.data);
+        isPatient = true;
+        _foundPatient = user;
       });
     } else {
       setState(() {
         _foundPatient = null;
       });
+      isPatient = false;
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -73,6 +93,23 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
           );
         },
       );
+    }
+  }
+
+  Widget buildButton(BuildContext context) {
+    if (isPatient) {
+      return FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Questionary()));
+        },
+        backgroundColor: const Color(0xFF03DAC6),
+        label: const Text('Nuevo Diagnostico'),
+        icon: const Icon(Icons.add),
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+      );
+    } else {
+      return const SizedBox(); // Si no está lleno, retornamos un widget vacío
     }
   }
 
@@ -113,24 +150,19 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
                     children: [
                       _infoText('ID: ${_foundPatient?.id ?? ""}'),
                       _infoText(
-                          'Name: ${_foundPatient?.firstName ?? ""} ${_foundPatient?.lastName ?? ""}'),
+                          'Name: ${_foundPatient?.nombre ?? ""} ${_foundPatient?.apellido ?? ""}'),
                       _infoText("Email: ${_foundPatient?.email ?? ""}"),
-                      _infoText("Age: ${_foundPatient?.age.toString() ?? ""}"),
+                      _infoText(
+                          "Birthday: ${_foundPatient?.fechaNacimiento ?? ""}"),
                     ],
                   ),
                 ),
               )
             ],
+            buildButton(context)
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            // Aquí iría la lógica para generar nuevo diagnóstico
-          },
-          label: const Text('Nuevo Diagnóstico'),
-          icon: const Icon(Icons.add),
-          backgroundColor: const Color(0xFF03DAC6)),
     );
   }
 
@@ -143,19 +175,4 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
           ),
         ),
       );
-}
-
-class Patient {
-  final String id;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final int age;
-
-  Patient(
-      {required this.id,
-      required this.firstName,
-      required this.lastName,
-      required this.email,
-      required this.age});
 }
