@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/Questionary.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Diagnostico extends StatelessWidget {
   const Diagnostico({super.key});
@@ -99,7 +100,9 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
   Widget buildButton(BuildContext context) {
     if (isPatient) {
       return FloatingActionButton.extended(
-        onPressed: () {
+        onPressed: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("Patient", _searchController.text);
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Questionary()));
         },

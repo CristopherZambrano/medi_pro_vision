@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Screems/Resultado.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Questionary extends StatelessWidget {
   Map<String, Color> customTheme = {
@@ -46,6 +47,7 @@ class QuestionnaireScreen extends StatefulWidget {
 class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
   TextEditingController numericText = TextEditingController();
   int currentQuestionIndex = 0;
+  int pedigree = 0;
   List<int> answer = [];
   final List<String> questions = [
     'Have you had an increase in thirst lately?', // Yes or No
@@ -66,15 +68,21 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
     'Do you have children with diabetes?'
   ];
 
-  void _nextQuestion(int? resp) {
-    if (resp != null) {
-      answer.add(resp);
+  void _nextQuestion(int? resp) async {
+    if (currentQuestionIndex >= 13) {
+      pedigree = pedigree + (resp ?? 0);
+    } else {
+      if (resp != null) {
+        answer.add(resp);
+      }
     }
     if (currentQuestionIndex < questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
       });
     } else {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setInt("pedigree", pedigree);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Resultado()));
     }
