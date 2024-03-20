@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:http/http.dart';
 import 'package:medi_pro_vision/Global/api_interceptors.dart';
 import 'package:medi_pro_vision/Models/user.dart';
 

@@ -1,9 +1,7 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
+import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Resultado extends StatelessWidget {
@@ -39,31 +37,47 @@ class Resultado extends StatelessWidget {
   }
 }
 
-class DiabetesRiskScreen extends StatelessWidget {
+//Statefull
+
+class DiabetesRiskScreen extends StatefulWidget {
   final Map<String, Color> customTheme;
-  String name = '';
-  int edad = 0;
-  double pedigree = 0;
+
   DiabetesRiskScreen({required this.customTheme});
 
-  void initState() async {
+  _DiabetesRiskScreemState createState() => _DiabetesRiskScreemState();
+}
+
+class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
+  late String name = '';
+  late int edad = 0;
+  late double pedigree = 0;
+  bool isloading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    userCharge();
+  }
+
+  Future<void> userCharge() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final Response =
         await buscarPaciente(prefs.getString('Patient').toString());
     User us = parseUserString(Response.data);
-    name = '${us.nombre} ${us.apellido}';
-    edad = calcularEdad(us.fechaNacimiento);
-    pedigree = 0.075 * edad + 0.212 * (prefs.getInt("pedigree") ?? 0);
-  }
+    setState(() {
+      name = '${us.nombre} ${us.apellido}';
+      edad = calcularEdad(us.fechaNacimiento);
+      pedigree = 0.075 * edad + 0.212 * (prefs.getInt("pedigree") ?? 0);
+      isloading = false;
+    });
 
-  void userCharge(String diagnosis) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    /* SharedPreferences prefs = await SharedPreferences.getInstance();
     int? Doctor = prefs.getInt('idUser');
     final Response =
         await buscarPaciente(prefs.getString('Patient').toString());
     User us = parseUserString(Response.data);
     final Response2 =
-        await guardarDiagnostico(us.id, diagnosis, Doctor.toString());
+        await guardarDiagnostico(us.id, diagnosis, Doctor.toString()); */
   }
 
   int calcularEdad(String fechaNacimiento) {
@@ -82,57 +96,62 @@ class DiabetesRiskScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Risk Assessment'),
-        backgroundColor: customTheme['primaryVariant'],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Patient Information',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            Text('Name: $name'),
-            Text('Age: $edad'),
-            Text('Pedigree: $pedigree'),
-            SizedBox(height: 20),
-            Text(
-              'Diabetes Risk',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text('Your estimated risk is 80%'),
-            Spacer(),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Validate Diagnosis'),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(),
-                    child: Text('Reject'),
-                  ),
-                ),
-              ],
-            )
-          ],
+        appBar: AppBar(
+          title: const Text('Risk Assessment'),
+          backgroundColor: const Color(0xFF004BA0),
         ),
-      ),
-    );
+        body: isloading
+            ? const Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Patient Information',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+                    Text('Name: $name'),
+                    Text('Age: $edad'),
+                    Text('Pedigree: ${pedigree.toStringAsFixed(3)}'),
+                    SizedBox(height: 20),
+                    Text(
+                      'Diabetes Risk',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Center(
+                      child: verPorcentaje(pedigree),
+                    ),
+                    Spacer(),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Positive diabetic'),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            style: ElevatedButton.styleFrom(),
+                            child: const Text('Not diabetic'),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ));
   }
 }
 

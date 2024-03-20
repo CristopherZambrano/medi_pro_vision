@@ -13,6 +13,35 @@ Widget primaryTitle(String title) {
   );
 }
 
+Widget verPorcentaje(double porcentaje) {
+  return Container(
+    width: 300,
+    height: 300,
+    child: Stack(
+      children: [
+        Center(
+          child: SizedBox(
+            width: 200,
+            height: 200,
+            child: CircularProgressIndicator(
+              value: porcentaje / 100,
+              backgroundColor: Colors.grey.shade200,
+              color: Colors.blue,
+              strokeWidth: 10,
+            ),
+          ),
+        ),
+        Center(
+          child: Text(
+            '${porcentaje.toStringAsFixed(0)}%',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 Widget listTab(String title, String description, String iconTab,
     {required VoidCallback onTap}) {
   return Container(
