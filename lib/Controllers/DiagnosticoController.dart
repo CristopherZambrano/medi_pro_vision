@@ -22,8 +22,26 @@ Future<HttpBaseResponse> buscarPaciente(String document) async {
 Future<HttpBaseResponse> guardarDiagnostico(
     int idPatient, String diagnostico, String idUser) async {
   try {
-    final Response = await api.post('/registerDiagnosis',
-        {"diagnostico": diagnostico, "idUser": idUser, "idPatient": idPatient});
+    final Response = await api.post('/registerDiagnosis', {
+      "diagnostico": diagnostico,
+      "idUser": idUser,
+      "idPatient": idPatient.toString()
+    });
+    if (Response.statusCode == 200) {
+      final decodedData = jsonDecode(Response.body);
+      return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
+    } else {
+      return HttpBaseResponse(
+          code: 500, message: "Error de conexión", data: null);
+    }
+  } on Exception {
+    return HttpBaseResponse(code: 1, message: "Error en la data", data: null);
+  }
+}
+
+Future<HttpBaseResponse> listarDiagnosticos(String idUser) async {
+  try {
+    final Response = await api.post('/findHistory', {"idUser": idUser});
     if (Response.statusCode == 200) {
       final decodedData = jsonDecode(Response.body);
       return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);

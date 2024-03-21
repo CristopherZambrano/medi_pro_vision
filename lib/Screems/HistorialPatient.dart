@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
+import 'package:medi_pro_vision/Models/Diagnosis.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class History extends StatelessWidget {
   @override
@@ -36,14 +42,68 @@ class History extends StatelessWidget {
   }
 }
 
-class PatientHistoryPage extends StatelessWidget {
-  final List<PatientDiagnosis> patientDiagnosis = [
-    PatientDiagnosis('Dr. Smith', DateTime(2023, 4, 10), 'No issues found.'),
-    PatientDiagnosis('Dr. Johnson', DateTime(2023, 3, 20),
-        'Prescribed medication for allergies.'),
-    PatientDiagnosis(
-        'Dr. Williams', DateTime(2023, 2, 15), 'Recommended surgery.'),
-  ];
+class PatientHistoryPage extends StatefulWidget {
+  @override
+  _PatientHistoryPageState createState() => _PatientHistoryPageState();
+}
+
+class _PatientHistoryPageState extends State<PatientHistoryPage> {
+  List<Diagnosis> diagnosisList = [];
+  List<dynamic> jsonData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPatientDiagnosis();
+  }
+
+  Future<void> _loadPatientDiagnosis() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response =
+        await listarDiagnosticos(prefs.getInt("idUser").toString());
+    if (response.code == 2) {
+      try {
+        String json = remplazar(response.data.toString());
+        json = json
+            .replaceAll('{', '{"')
+            .replaceAll('=', '":"')
+            .replaceAll(', ', '","')
+            .replaceAll('}', '"}');
+        String correctedJsonString = json.replaceAll('"}","{"', '"},{"');
+        print(correctedJsonString);
+        jsonData = jsonDecode(correctedJsonString);
+        print(jsonData);
+        //List<String> jsonObjects = correctedJsonString.split(',');
+
+        setState(() {
+          /* for (String jsonObject in jsonObjects) {
+            Map<String, dynamic> jsonMap = jsonDecode(jsonObject);
+            diagnosisList.add(Diagnosis.fromJson(jsonMap));
+          } */
+
+          /* print(json);
+          jsonData = jsonDecode(json);
+          print(jsonData); */
+          diagnosisList = jsonData.map((dynamic item) {
+            return Diagnosis.fromJson(Map<String, dynamic>.from(item));
+          }).toList();
+        });
+      } catch (e) {
+        print('Error al analizar los diagnósticos: $e');
+      }
+    }
+  }
+
+  String remplazar(String data) {
+    data = data.replaceAll('Diagnosis', '');
+
+// Reemplazar '(' por '{'
+    data = data.replaceAll('(', '{');
+
+// Reemplazar ')' por '}'
+    data = data.replaceAll(')', '}');
+    return data;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,27 +112,18 @@ class PatientHistoryPage extends StatelessWidget {
         title: const Text('Historial del Paciente'),
       ),
       body: ListView.builder(
-        itemCount: patientDiagnosis.length,
+        itemCount: diagnosisList.length,
         itemBuilder: (context, index) {
           return Card(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             child: ListTile(
-              title: Text(patientDiagnosis[index].doctor),
-              subtitle: Text(
-                  '${patientDiagnosis[index].diagnosisDate.year}-${patientDiagnosis[index].diagnosisDate.month}-${patientDiagnosis[index].diagnosisDate.day}'),
-              trailing: Text(patientDiagnosis[index].result),
+              title: Text(diagnosisList[index].id.toString()),
+              subtitle: Text(diagnosisList[index].dateDiagnosis.toString()),
+              trailing: Text(diagnosisList[index].diagnosis.toString()),
             ),
           );
         },
       ),
     );
   }
-}
-
-class PatientDiagnosis {
-  final String doctor;
-  final DateTime diagnosisDate;
-  final String result;
-
-  PatientDiagnosis(this.doctor, this.diagnosisDate, this.result);
 }

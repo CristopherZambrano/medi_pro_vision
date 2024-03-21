@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
+import 'package:medi_pro_vision/Models/Diagnosis.dart';
+import 'package:medi_pro_vision/Models/user.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
+import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
+import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,6 +56,8 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
   late String name = '';
   late int edad = 0;
   late double pedigree = 0;
+  late User us;
+  late Diagnosis diagno;
   bool isloading = true;
 
   @override
@@ -59,25 +66,25 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
     userCharge();
   }
 
+  void sendDiagnosis() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final Response = await guardarDiagnostico(
+        us.id, "Diabetico", prefs.getInt("idUser").toString());
+    print(Response.message);
+    diagno = Diagnosis.fromString(Response.data);
+  }
+
   Future<void> userCharge() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final Response =
         await buscarPaciente(prefs.getString('Patient').toString());
-    User us = parseUserString(Response.data);
+    us = parseUserString(Response.data);
     setState(() {
       name = '${us.nombre} ${us.apellido}';
       edad = calcularEdad(us.fechaNacimiento);
       pedigree = 0.075 * edad + 0.212 * (prefs.getInt("pedigree") ?? 0);
       isloading = false;
     });
-
-    /* SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? Doctor = prefs.getInt('idUser');
-    final Response =
-        await buscarPaciente(prefs.getString('Patient').toString());
-    User us = parseUserString(Response.data);
-    final Response2 =
-        await guardarDiagnostico(us.id, diagnosis, Doctor.toString()); */
   }
 
   int calcularEdad(String fechaNacimiento) {
@@ -132,7 +139,12 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              sendDiagnosis();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const sendTreatment()));
                             },
                             child: const Text('Positive diabetic'),
                           ),
@@ -141,7 +153,10 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Home()));
                             },
                             style: ElevatedButton.styleFrom(),
                             child: const Text('Not diabetic'),
