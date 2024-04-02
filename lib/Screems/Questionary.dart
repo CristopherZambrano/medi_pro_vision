@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Screems/Diagnosticos.dart';
 import 'package:medi_pro_vision/Screems/Resultado.dart';
+import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Questionary extends StatelessWidget {
@@ -84,7 +86,11 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setInt("pedigree", pedigree);
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Resultado()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => Resultado(
+                    answer: answer,
+                  )));
     }
   }
 
@@ -92,8 +98,18 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Questionnaire'),
-      ),
+          title: const Text('Questionnaire'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              showDialogAlertAndRedirection(
+                  context, 'Cancelar', 'Se cancelaran todos los cambios',
+                  onPressed: () => {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const Diagnostico()))
+                      });
+            },
+          )),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

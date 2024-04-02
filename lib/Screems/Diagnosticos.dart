@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/Questionary.dart';
+import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Diagnostico extends StatelessWidget {
@@ -120,8 +121,14 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Patient Search"),
-      ),
+          title: const Text("Patient Search"),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Home()));
+            },
+          )),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

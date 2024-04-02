@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/Diagnosis.dart';
-import 'package:medi_pro_vision/Models/user.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
@@ -10,7 +8,8 @@ import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Resultado extends StatelessWidget {
-  Resultado({super.key});
+  List<int> answer = [];
+  Resultado({super.key, required this.answer});
 
   Map<String, Color> customTheme = {
     'primary': const Color(0xFF1976D2),
@@ -37,7 +36,10 @@ class Resultado extends StatelessWidget {
           ),
         ),
       ),
-      home: DiabetesRiskScreen(customTheme: customTheme),
+      home: DiabetesRiskScreen(
+        customTheme: customTheme,
+        answer: answer,
+      ),
     );
   }
 }
@@ -46,8 +48,9 @@ class Resultado extends StatelessWidget {
 
 class DiabetesRiskScreen extends StatefulWidget {
   final Map<String, Color> customTheme;
+  List<int> answer = [];
 
-  DiabetesRiskScreen({required this.customTheme});
+  DiabetesRiskScreen({required this.customTheme, required this.answer});
 
   _DiabetesRiskScreemState createState() => _DiabetesRiskScreemState();
 }
@@ -58,12 +61,26 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
   late double pedigree = 0;
   late User us;
   late Diagnosis diagno;
+  late double prom = 0;
   bool isloading = true;
 
   @override
   void initState() {
     super.initState();
+    prom = (calcularPromedio(widget.answer) * 100);
     userCharge();
+  }
+
+  double calcularPromedio(List<int> lista) {
+    if (lista.isEmpty) {
+      return 0; // Devuelve 0 si la lista está vacía para evitar una división por cero
+    }
+    int suma = 0;
+    for (int numero in lista) {
+      suma += numero;
+    }
+    double promedio = suma / lista.length;
+    return promedio;
   }
 
   void sendDiagnosis() async {
@@ -131,7 +148,7 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                     ),
                     SizedBox(height: 8),
                     Center(
-                      child: verPorcentaje(pedigree),
+                      child: verPorcentaje(prom),
                     ),
                     Spacer(),
                     Row(

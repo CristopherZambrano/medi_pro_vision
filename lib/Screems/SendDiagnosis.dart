@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Screems/home.dart';
 
 class sendTreatment extends StatelessWidget {
   const sendTreatment({super.key});
@@ -131,6 +132,16 @@ class DietPage extends StatelessWidget {
           ListTile(title: Text('Bebidas azucaradas')),
           ListTile(title: Text('Harinas refinadas')),
           ListTile(title: Text('Fast food')),
+          FloatingActionButton.extended(
+            onPressed: () async {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Home()));
+            },
+            backgroundColor: const Color(0xFF03DAC6),
+            label: const Text('Registrar tratamiento'),
+            icon: const Icon(Icons.add),
+            extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+          )
         ],
       ),
     );
@@ -199,6 +210,16 @@ class _InsulinPageState extends State<InsulinPage> {
             child:
                 Text('Dosis de Insulina: ${_insulinDose.round().toString()}ml'),
           ),
+          FloatingActionButton.extended(
+            onPressed: () async {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Home()));
+            },
+            backgroundColor: const Color(0xFF03DAC6),
+            label: const Text('Nuevo Diagnostico'),
+            icon: const Icon(Icons.add),
+            extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+          )
         ],
       ),
     );

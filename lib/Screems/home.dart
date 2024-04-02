@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Screems/Diagnosticos.dart';
 import 'package:medi_pro_vision/Screems/HistorialPatient.dart';
 import 'package:medi_pro_vision/Screems/profile.dart';
+import 'package:medi_pro_vision/Screems/tratamientos.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
+import 'package:medi_pro_vision/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
@@ -75,18 +77,18 @@ class HomePage extends StatelessWidget {
                 'Monitor the progress of your medical treatment.',
                 'assets/seguimiento.png', onTap: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Profile()));
-            }),
-            listTab('Quotes', 'Check your pending appointments.',
-                'assets/calendar.png', onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Profile()));
+                  MaterialPageRoute(builder: (context) => Tratamientos()));
             }),
             listTab('Profile', 'Manage your personal and medical information.',
                 'assets/perfil.png', onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const Profile()));
-            })
+            }),
+            listTab('Log out', 'Sign out of the account', 'assets/calendar.png',
+                onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MyApp()));
+            }),
           ],
         ),
       ),

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/Diagnosis.dart';
+import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class History extends StatelessWidget {
@@ -50,6 +50,7 @@ class PatientHistoryPage extends StatefulWidget {
 class _PatientHistoryPageState extends State<PatientHistoryPage> {
   List<Diagnosis> diagnosisList = [];
   List<dynamic> jsonData = [];
+  String name = "";
 
   @override
   void initState() {
@@ -94,6 +95,16 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
     }
   }
 
+  Future<String> ChargeName(String id) async {
+    final response = await DoctorName(id);
+    if (response.code == 2) {
+      print(response.data);
+      return response.data;
+    } else {
+      return "No disponible";
+    }
+  }
+
   String remplazar(String data) {
     data = data.replaceAll('Diagnosis', '');
 
@@ -109,15 +120,21 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historial del Paciente'),
-      ),
+          title: const Text('Historial del Paciente'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Home()));
+            },
+          )),
       body: ListView.builder(
         itemCount: diagnosisList.length,
         itemBuilder: (context, index) {
           return Card(
             margin: EdgeInsets.all(8),
             child: ListTile(
-              title: Text(diagnosisList[index].id.toString()),
+              title: Text(diagnosisList[index].idDoctor.toString()),
               subtitle: Text(diagnosisList[index].dateDiagnosis.toString()),
               trailing: Text(diagnosisList[index].diagnosis.toString()),
             ),
