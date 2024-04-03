@@ -131,11 +131,7 @@ class _LogInScreemState extends State<LogInScreem> {
       message = response.message;
       User user = parseUserString(jsonEncode(response.data.toString()));
       verifyTipeUser(user.id).then((int valor) {
-        prefs.setInt("idUser", user.id);
-        String name = user.nombre.toString();
-        String last = user.apellido.toString();
-        prefs.setString("name", "$name $last");
-        prefs.setString("email", user.email.toString());
+        prefs.setString('User', response.data.toString());
         prefs.setInt("TipeUser", valor);
       });
     }

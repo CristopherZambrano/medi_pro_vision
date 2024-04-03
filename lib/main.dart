@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Screems/log_in.dart';
+import 'package:medi_pro_vision/Screems/profile.dart';
 import 'package:medi_pro_vision/Screems/register_user.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Profile());
 }
 
 class MyApp extends StatelessWidget {

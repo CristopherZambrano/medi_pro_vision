@@ -143,6 +143,25 @@ Widget formDate(String messageError, String labelText, String hintText,
   );
 }
 
+Widget textInmovible(TextEditingController controller, String fintText) {
+  return TextFormField(
+    controller: controller,
+    enabled: false,
+    decoration: InputDecoration(labelText: fintText),
+  );
+}
+
+Widget textField(String label, TextEditingController controller) {
+  return TextField(
+    controller: controller,
+    decoration: InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: Colors.white,
+    ),
+  );
+}
+
 Widget formNumber(String messageError, String labelText, String hintText,
     Icon icono, TextEditingController control) {
   return TextFormField(
