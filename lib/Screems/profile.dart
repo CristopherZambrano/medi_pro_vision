@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Models/user1.dart';
+import 'package:medi_pro_vision/Screems/Resultado.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -55,14 +58,13 @@ class ProfileScreem extends StatefulWidget {
 class _ProfileScreemState extends State<ProfileScreem> {
   TextEditingController nameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
-  TextEditingController birthdayController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  TextEditingController idCardController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    chargeUser();
     return Scaffold(
       appBar: AppBar(
         title: const Text('User profile'),
@@ -87,11 +89,7 @@ class _ProfileScreemState extends State<ProfileScreem> {
             SizedBox(height: 8),
             textInmovible(lastNameController, 'Last Name'),
             SizedBox(height: 8),
-            textInmovible(birthdayController, 'Birthdate'),
-            SizedBox(height: 8),
             textInmovible(addressController, 'Address'),
-            SizedBox(height: 8),
-            textInmovible(idCardController, 'Id Card'),
             SizedBox(height: 8),
             textInmovible(emailController, 'Email'),
             SizedBox(height: 8),
@@ -100,6 +98,16 @@ class _ProfileScreemState extends State<ProfileScreem> {
         ),
       ),
     );
+  }
+
+  void chargeUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    User us = parseUserString(prefs.getString('User').toString());
+    nameController.text = us.nombre.toString();
+    lastNameController.text = us.apellido.toString();
+    addressController.text = us.direccion.toString();
+    emailController.text = us.email.toString();
+    phoneController.text = us.celular.toString();
   }
 
   showEditDialog(BuildContext context) {
@@ -114,11 +122,7 @@ class _ProfileScreemState extends State<ProfileScreem> {
               SizedBox(height: 10),
               textField("Last Name", lastNameController),
               SizedBox(height: 10),
-              textField("Date of Birth", birthdayController),
-              SizedBox(height: 10),
               textField("Address", addressController),
-              SizedBox(height: 10),
-              textField("ID", idCardController),
               SizedBox(height: 10),
               textField("Email", emailController),
               SizedBox(height: 10),
@@ -135,8 +139,8 @@ class _ProfileScreemState extends State<ProfileScreem> {
           ),
           ElevatedButton(
             onPressed: () {
-              // Implement save functionality
-              Navigator.of(context).pop();
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Profile()));
             },
             child: Text('Save'),
           ),

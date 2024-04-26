@@ -4,7 +4,7 @@ import 'package:medi_pro_vision/Screems/profile.dart';
 import 'package:medi_pro_vision/Screems/register_user.dart';
 
 void main() {
-  runApp(const Profile());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
