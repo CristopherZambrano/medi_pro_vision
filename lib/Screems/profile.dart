@@ -70,6 +70,9 @@ class _ProfileScreemState extends State<ProfileScreem> {
   TextEditingController addressNew = TextEditingController();
   TextEditingController emailNew = TextEditingController();
   TextEditingController phoneNew = TextEditingController();
+  TextEditingController passwordOldController = TextEditingController();
+  TextEditingController passwordNewController = TextEditingController();
+  TextEditingController passwordNewOk = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +108,11 @@ class _ProfileScreemState extends State<ProfileScreem> {
             textInmovible(emailController, 'Email'),
             SizedBox(height: 8),
             textInmovible(phoneController, 'Phone'),
+            ElevatedButton(
+                onPressed: () async {
+                  await showEditPassword(context);
+                },
+                child: const Text("Change password"))
           ],
         ),
       ),
@@ -177,6 +185,64 @@ class _ProfileScreemState extends State<ProfileScreem> {
         });
   }
 
+  showEditPassword(BuildContext context) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Change Password"),
+            content: SingleChildScrollView(
+                child: Column(
+              children: [
+                formPassword(
+                    "Please enter a valid password",
+                    "Old password",
+                    "Enter Your password",
+                    const Icon(Icons.key_rounded),
+                    passwordOldController),
+                formPassword(
+                    "Please enter a valid password",
+                    "New Password",
+                    "Enter the new password",
+                    const Icon(Icons.key_rounded),
+                    passwordNewController),
+                formPassword(
+                    "Please enter a valid password",
+                    "Validate new password",
+                    "Enter the new password",
+                    const Icon(Icons.key_rounded),
+                    passwordNewOk),
+              ],
+            )),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  modifiedPassword().then((value) {
+                    if (value == "Succesfully") {
+                      showDialogAlertAndRedirection(
+                          context, 'Correct', 'Password changed successfully',
+                          onPressed: () => {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => const Profile()))
+                              });
+                    } else {
+                      showDialogAlert(context, 'Incorrect', value);
+                    }
+                  });
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        });
+  }
+
   Future<bool> editProfile() async {
     bool changed = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -189,5 +255,25 @@ class _ProfileScreemState extends State<ProfileScreem> {
       prefs.setString('User', response.data.toString());
     }
     return changed;
+  }
+
+  Future<String> modifiedPassword() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    User us = parseUserString(prefs.getString('User').toString());
+    if (passwordNewController.text == passwordNewOk) {
+      return "Password no valida";
+    } else {
+      if (passwordNewController.text == passwordOldController) {
+        return "New password cannot be the same as the previous one";
+      } else {
+        if (passwordOldController.text == us.password) {
+          final response = await changePassword(
+              us.id.toString(), passwordNewController.text);
+          return response;
+        } else {
+          return "Old password does not match";
+        }
+      }
+    }
   }
 }

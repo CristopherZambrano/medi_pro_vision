@@ -59,3 +59,20 @@ Future<HttpBaseResponse> editUser(String id, String name, String lastName,
         code: 400, message: "Error de conexión", data: null);
   }
 }
+
+Future<String> changePassword(String id, String password) async {
+  try {
+    final response = await api.post('/changePassword', {
+      'id': id,
+      'password': password,
+    });
+    if (response.statusCode == 200) {
+      print("El response bota " + response.body);
+      return response.body;
+    } else {
+      return "Error de conexión";
+    }
+  } on Exception {
+    return "Error de conexión";
+  }
+}
