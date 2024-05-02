@@ -35,3 +35,27 @@ Future<int> verifyTipeUser(int id) async {
     return 0;
   }
 }
+
+Future<HttpBaseResponse> editUser(String id, String name, String lastName,
+    String address, String email, String cellPhone) async {
+  try {
+    final response = await api.post('/editUser', {
+      'id': id,
+      'name': name,
+      'lastName': lastName,
+      'address': address,
+      'email': email,
+      'cellPhone': cellPhone
+    });
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body);
+      return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
+    } else {
+      return HttpBaseResponse(
+          code: 500, message: "Error de conexión", data: null);
+    }
+  } on Exception {
+    return HttpBaseResponse(
+        code: 400, message: "Error de conexión", data: null);
+  }
+}
