@@ -136,6 +136,7 @@ class _LogInScreemState extends State<LogInScreem> {
       });
     }
     if (response.code == 2) {
+      message = response.message;
       isAuth = false;
     }
     return isAuth;

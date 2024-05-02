@@ -123,6 +123,7 @@ Widget formPassword(String messageError, String labelText, String hintText,
     decoration:
         InputDecoration(labelText: labelText, icon: icono, hintText: hintText),
     keyboardType: TextInputType.visiblePassword,
+    obscureText: true,
     controller: control,
   );
 }
