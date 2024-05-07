@@ -219,3 +219,41 @@ void showDialogAlertAndRedirection(
         );
       });
 }
+
+Widget diagnosisTab(String doctor, String diagnosis, String dateDiagnosis) {
+  return Card(
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    diagnosis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 9),
+                  Text(
+                    doctor,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+              )),
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                dateDiagnosis,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )
+            ],
+          ))
+        ],
+      ),
+    ),
+  );
+}

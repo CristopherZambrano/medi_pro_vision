@@ -3,6 +3,7 @@ import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/Questionary.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
+import 'package:medi_pro_vision/Screems/listDiagnosis.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Diagnostico extends StatelessWidget {
@@ -35,6 +36,7 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
   bool isPatient = false;
   final TextEditingController _searchController = TextEditingController();
   User? _foundPatient;
+  late User user;
 
   User parseUserString(String userString) {
     List<String> parts = userString.split(', ');
@@ -67,9 +69,11 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
   void _search() async {
     final id = _searchController.text;
     final response = await buscarPaciente(id);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     if (response.code == 1) {
       setState(() {
-        User user = parseUserString(response.data);
+        user = parseUserString(response.data);
+        prefs.setString("Patient", id);
         isPatient = true;
         _foundPatient = user;
       });
@@ -98,82 +102,113 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
     }
   }
 
-  Widget buildButton(BuildContext context) {
-    if (isPatient) {
-      return FloatingActionButton.extended(
-        onPressed: () async {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString("Patient", _searchController.text);
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Questionary()));
-        },
-        backgroundColor: const Color(0xFF03DAC6),
-        label: const Text('Nuevo Diagnostico'),
-        icon: const Icon(Icons.add),
-        extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-      );
-    } else {
-      return const SizedBox(); // Si no está lleno, retornamos un widget vacío
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: const Text("Patient Search"),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Home()));
-            },
-          )),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: "Enter Patient ID",
-                suffixIcon: IconButton(
-                  onPressed: _searchController.clear,
-                  icon: const Icon(Icons.clear),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _search,
-              style: ElevatedButton.styleFrom(),
-              child: const Text('Search'),
-            ),
-            const SizedBox(height: 20),
-            if (_foundPatient != null) ...[
-              Card(
-                color: const Color(0xFF03DAC6),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _infoText('ID: ${_foundPatient?.id ?? ""}'),
-                      _infoText(
-                          'Name: ${_foundPatient?.nombre ?? ""} ${_foundPatient?.apellido ?? ""}'),
-                      _infoText("Email: ${_foundPatient?.email ?? ""}"),
-                      _infoText(
-                          "Birthday: ${_foundPatient?.fechaNacimiento ?? ""}"),
-                    ],
+        appBar: AppBar(
+            title: const Text("Patient Search"),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Home()));
+              },
+            )),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: "Enter Patient ID",
+                    suffixIcon: IconButton(
+                      onPressed: _searchController.clear,
+                      icon: const Icon(Icons.clear),
+                    ),
                   ),
                 ),
-              )
-            ],
-            buildButton(context)
-          ],
-        ),
-      ),
-    );
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _search,
+                  style: ElevatedButton.styleFrom(),
+                  child: const Text('Search'),
+                ),
+                const SizedBox(height: 20),
+                if (_foundPatient != null) ...[
+                  Card(
+                    color: const Color(0xFF03DAC6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _infoText('ID: ${_foundPatient?.id ?? ""}'),
+                          _infoText(
+                              'Name: ${_foundPatient?.nombre ?? ""} ${_foundPatient?.apellido ?? ""}'),
+                          _infoText("Email: ${_foundPatient?.email ?? ""}"),
+                          _infoText(
+                              "Birthday: ${_foundPatient?.fechaNacimiento ?? ""}"),
+                        ],
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () async {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Questionary()));
+                      },
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              const Color(0xFF03DAC6)),
+                          padding: MaterialStateProperty.all<
+                                  EdgeInsetsGeometry>(
+                              const EdgeInsets.symmetric(horizontal: 16.0))),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add),
+                          SizedBox(width: 8),
+                          Text(
+                            "New Diagnosis",
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
+                      )),
+                  const SizedBox(),
+                  TextButton(
+                      onPressed: () async {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ListDiagnosis(idPatient: user.id)));
+                      },
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.grey),
+                          padding: MaterialStateProperty.all<
+                                  EdgeInsetsGeometry>(
+                              const EdgeInsets.symmetric(horizontal: 16.0))),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add),
+                          SizedBox(width: 8),
+                          Text(
+                            "See diagnoses",
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
+                      )),
+                ],
+              ],
+            ),
+          ),
+        ));
   }
 
   Widget _infoText(String text) => Padding(

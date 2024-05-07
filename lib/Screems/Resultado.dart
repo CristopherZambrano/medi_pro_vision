@@ -83,19 +83,20 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
     return promedio;
   }
 
-  void sendDiagnosis() async {
+  Future<int> sendDiagnosis(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final Response = await guardarDiagnostico(
-        us.id, "Diabetico", prefs.getInt("idUser").toString());
-    print(Response.message);
-    diagno = Diagnosis.fromString(Response.data);
+    User user = parseUserString(prefs.getString("User") ?? "");
+    final response =
+        await guardarDiagnostico(us.id, "Diabetico", user.id.toString());
+    print(response.message);
+    return response.code;
   }
 
   Future<void> userCharge() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final Response =
+    final response =
         await buscarPaciente(prefs.getString('Patient').toString());
-    us = parseUserString(Response.data);
+    us = parseUserString(response.data);
     setState(() {
       name = '${us.nombre} ${us.apellido}';
       edad = calcularEdad(us.fechaNacimiento);
@@ -131,22 +132,22 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       'Patient Information',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text('Name: $name'),
                     Text('Age: $edad'),
                     Text('Pedigree: ${pedigree.toStringAsFixed(3)}'),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Diabetes Risk',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Center(
                       child: verPorcentaje(prom),
                     ),
@@ -156,12 +157,24 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              sendDiagnosis();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const sendTreatment()));
+                              sendDiagnosis(context).then((value) {
+                                if (value == 1) {
+                                  showDialogAlert(context, "Error",
+                                      "Error when entering diagnosis");
+                                } else {
+                                  showDialogAlertAndRedirection(
+                                      context,
+                                      "Succesfully",
+                                      "Diagnosis entered correctly",
+                                      onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const sendTreatment()));
+                                  });
+                                }
+                              });
                             },
                             child: const Text('Positive diabetic'),
                           ),
