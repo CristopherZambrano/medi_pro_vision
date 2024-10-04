@@ -62,7 +62,7 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final response =
         await listarDiagnosticos(prefs.getInt("idUser").toString());
-    if (response.code == 2) {
+    /* if (response.code == 2) {
       try {
         String json = remplazar(response.data.toString());
         json = json
@@ -92,7 +92,7 @@ class _PatientHistoryPageState extends State<PatientHistoryPage> {
       } catch (e) {
         print('Error al analizar los diagnósticos: $e');
       }
-    }
+    } */
   }
 
   Future<String> ChargeName(String id) async {

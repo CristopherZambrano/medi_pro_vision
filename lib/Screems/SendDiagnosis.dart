@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Controllers/medicineController.dart';
+import 'package:medi_pro_vision/Models/Medicamentos.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
 
 class sendTreatment extends StatelessWidget {
@@ -154,25 +156,92 @@ class MedicationPage extends StatefulWidget {
 }
 
 class _MedicationPageState extends State<MedicationPage> {
-  final List<String> medications = ['Metformina', 'Sulfonylureas', 'Insulina'];
-  final Map<String, bool> selectedMedications = {};
+  late Future<List<Medicine>> medications;
+  List<Medicine> selectedMedications = [];
+
+  @override
+  void initState() {
+    super.initState();
+    medications = listMedicine();
+  }
+
+  void toggleSelection(Medicine medicine, bool isSelected) {
+    setState(() {
+      if (isSelected) {
+        selectedMedications.add(
+            medicine); // Agregar el medicamento a la lista de seleccionados
+      } else {
+        selectedMedications
+            .remove(medicine); // Remover el medicamento si se deselecciona
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Ingesta de Fármacos')),
-      body: ListView(
-        children: medications
-            .map((medication) => CheckboxListTile(
-                  title: Text(medication),
-                  value: selectedMedications[medication] ?? false,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      selectedMedications[medication] = value!;
-                    });
-                  },
-                ))
-            .toList(),
+      appBar: AppBar(title: const Text('Ingesta de Fármacos')),
+      body: FutureBuilder<List<Medicine>>(
+        future: medications,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No se encontraron medicamentos'));
+          } else {
+            List<Medicine> medicinas = snapshot.data!;
+            return ListView.builder(
+              itemCount: medicinas.length,
+              itemBuilder: (context, index) {
+                Medicine medicine = medicinas[index];
+                bool isSelected = selectedMedications
+                    .contains(medicine); // Verifica si está seleccionado
+
+                return ListTile(
+                  title: Text(medicine.tradeName),
+                  subtitle: Text(medicine.genericName),
+                  trailing: Checkbox(
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      toggleSelection(medicine, value ?? false);
+                    },
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Aquí puedes manejar los medicamentos seleccionados
+          if (selectedMedications.isNotEmpty) {
+            // Por ejemplo, mostrar un diálogo con los medicamentos seleccionados
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text('Medicamentos seleccionados'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: selectedMedications
+                        .map((medicine) => Text(medicine.tradeName))
+                        .toList(),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cerrar'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        },
+        child: Icon(Icons.check),
       ),
     );
   }

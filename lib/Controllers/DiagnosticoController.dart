@@ -6,9 +6,9 @@ final ApiInterceptor api = ApiInterceptor();
 
 Future<HttpBaseResponse> buscarPaciente(String document) async {
   try {
-    final Response = await api.post('/findUserDoc', {"Documento": document});
-    if (Response.statusCode == 200) {
-      final decodedData = jsonDecode(Response.body);
+    final response = await api.post('/findUserDoc', {"Documento": document});
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body);
       return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
     } else {
       return HttpBaseResponse(
@@ -39,26 +39,24 @@ Future<HttpBaseResponse> guardarDiagnostico(
   }
 }
 
-Future<HttpBaseResponse> listarDiagnosticos(String idUser) async {
+Future<String> listarDiagnosticos(String idUser) async {
   try {
-    final Response = await api.post('/findHistory', {"idUser": idUser});
-    if (Response.statusCode == 200) {
-      final decodedData = jsonDecode(Response.body);
-      return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
+    final response = await api.post('/findHistory', {"idUser": idUser});
+    if (response.statusCode == 200) {
+      return response.body.toString();
     } else {
-      return HttpBaseResponse(
-          code: 500, message: "Error de conexión", data: null);
+      return 'Coneption error';
     }
   } on Exception {
-    return HttpBaseResponse(code: 1, message: "Error en la data", data: null);
+    return 'Internal error';
   }
 }
 
 Future<HttpBaseResponse> DoctorName(String idUser) async {
   try {
-    final Response = await api.post('/findUserforDoctor', {"idDoctor": idUser});
-    if (Response.statusCode == 200) {
-      final decodedData = jsonDecode(Response.body);
+    final response = await api.post('/findUserforDoctor', {"idDoctor": idUser});
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body);
       return HttpBaseResponse.fromJson(decodedData as Map<String, dynamic>);
     } else {
       return HttpBaseResponse(

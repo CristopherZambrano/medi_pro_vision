@@ -112,7 +112,9 @@ class _LogInScreemState extends State<LogInScreem> {
     checkUser().then((checkUserResult) {
       if (checkUserResult == true) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const Home()));
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
       } else {
         showDialogAlert(context, 'Wrong', message);
       }
