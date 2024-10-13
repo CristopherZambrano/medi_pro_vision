@@ -181,67 +181,170 @@ class _MedicationPageState extends State<MedicationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Ingesta de Fármacos')),
-      body: FutureBuilder<List<Medicine>>(
-        future: medications,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No se encontraron medicamentos'));
-          } else {
-            List<Medicine> medicinas = snapshot.data!;
-            return ListView.builder(
-              itemCount: medicinas.length,
-              itemBuilder: (context, index) {
-                Medicine medicine = medicinas[index];
-                bool isSelected = selectedMedications
-                    .contains(medicine); // Verifica si está seleccionado
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<List<Medicine>>(
+              future: medications,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                      child: Text('No se encontraron medicamentos'));
+                } else {
+                  List<Medicine> medicinas = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: medicinas.length,
+                    itemBuilder: (context, index) {
+                      Medicine medicine = medicinas[index];
+                      bool isSelected = selectedMedications.contains(medicine);
 
-                return ListTile(
-                  title: Text(medicine.tradeName),
-                  subtitle: Text(medicine.genericName),
-                  trailing: Checkbox(
-                    value: isSelected,
-                    onChanged: (bool? value) {
-                      toggleSelection(medicine, value ?? false);
+                      return ListTile(
+                        title: Text(medicine.tradeName),
+                        subtitle: Text(medicine.genericName),
+                        trailing: Checkbox(
+                          value: isSelected,
+                          onChanged: (bool? value) {
+                            toggleSelection(medicine, value ?? false);
+                          },
+                        ),
+                      );
                     },
-                  ),
-                );
+                  );
+                }
               },
-            );
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Aquí puedes manejar los medicamentos seleccionados
-          if (selectedMedications.isNotEmpty) {
-            // Por ejemplo, mostrar un diálogo con los medicamentos seleccionados
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text('Medicamentos seleccionados'),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: selectedMedications
-                        .map((medicine) => Text(medicine.tradeName))
-                        .toList(),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('Cerrar'),
-                    ),
-                  ],
-                );
-              },
-            );
-          }
-        },
-        child: Icon(Icons.check),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(
+                16.0), // Agrega espacio alrededor de los botones
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment
+                  .stretch, // Asegura que los botones ocupen todo el ancho
+              children: [
+                TextButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        String tradeName = '';
+                        String genericName = '';
+                        String presentation = 'Tabletas'; // Valor inicial
+                        double concentration = 0;
+
+                        return AlertDialog(
+                          title: const Text('Agregar Medicamento'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                TextField(
+                                  decoration: const InputDecoration(
+                                      labelText: 'Nombre Comercial'),
+                                  onChanged: (value) {
+                                    tradeName = value;
+                                  },
+                                ),
+                                TextField(
+                                  decoration: const InputDecoration(
+                                      labelText: 'Nombre Genérico'),
+                                  onChanged: (value) {
+                                    genericName = value;
+                                  },
+                                ),
+                                DropdownButtonFormField<String>(
+                                  value: presentation,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Presentación'),
+                                  onChanged: (String? newValue) {
+                                    presentation = newValue!;
+                                  },
+                                  items: ['Tabletas', 'Jarabe', 'Inyección']
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                ),
+                                TextField(
+                                  decoration: const InputDecoration(
+                                      labelText: 'Concentración (MG)'),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    concentration = double.tryParse(value) ?? 0;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(); // Cierra el modal sin guardar
+                              },
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                if (tradeName.isNotEmpty &&
+                                    genericName.isNotEmpty &&
+                                    concentration > 0) {
+                                  Medicine med = Medicine(
+                                      id: 0,
+                                      tradeName: tradeName,
+                                      genericName: genericName,
+                                      presentation:
+                                          "$presentation${concentration}MG");
+                                  saveMedicine(med);
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              child: const Text('Guardar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Agregar Medicamento'),
+                ),
+                const SizedBox(height: 10), // Espacio entre los botones
+                TextButton(
+                  onPressed: () {
+                    if (selectedMedications.isNotEmpty) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Medicamentos seleccionados'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: selectedMedications
+                                  .map((medicine) => Text(medicine.tradeName))
+                                  .toList(),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cerrar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                  child: const Text('Ver Selección'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
