@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/register_controller.dart';
 import 'package:medi_pro_vision/Screems/log_in.dart';
+import 'package:medi_pro_vision/Widgets/TextBox.dart';
+import 'package:medi_pro_vision/Widgets/botones.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 
 class RegisterUser extends StatelessWidget {
@@ -8,9 +10,10 @@ class RegisterUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
       title: 'Register user',
-      home: FormRegister(),
+      home: const FormRegister(),
     );
   }
 }
@@ -23,8 +26,9 @@ class FormRegister extends StatefulWidget {
 }
 
 class _FormRegisterState extends State<FormRegister> {
-  final _patientKey = GlobalKey<FormState>();
-  final _doctorKey = GlobalKey<FormState>();
+  final _patientFormKey = GlobalKey<FormState>();
+  final _doctorFormKey = GlobalKey<FormState>();
+
   TextEditingController nameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController birthdayController = TextEditingController();
@@ -32,51 +36,124 @@ class _FormRegisterState extends State<FormRegister> {
   TextEditingController cellPhoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController addresController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
   TextEditingController idNumberController = TextEditingController();
+
   TextEditingController specialityController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+
   String message = '';
 
-  Future<bool> regiPatient() async {
-    bool register = false;
-    final response = await registerPatient(
-      nameController.text,
-      lastNameController.text,
-      emailController.text,
-      passwordController.text,
-      birthdayController.text,
-      cellPhoneController.text,
-      genderController.text,
-      idNumberController.text,
-      addresController.text,
-    );
+  Future<bool> register(bool isDoctor) async {
+    bool registerSuccess = false;
+    final response = isDoctor
+        ? await registerDoctor(
+            nameController.text,
+            lastNameController.text,
+            emailController.text,
+            passwordController.text,
+            birthdayController.text,
+            cellPhoneController.text,
+            genderController.text,
+            idNumberController.text,
+            addressController.text,
+            specialityController.text,
+            descriptionController.text)
+        : await registerPatient(
+            nameController.text,
+            lastNameController.text,
+            emailController.text,
+            passwordController.text,
+            birthdayController.text,
+            cellPhoneController.text,
+            genderController.text,
+            idNumberController.text,
+            addressController.text);
+
     if (response.code == 1) {
-      register = true;
+      registerSuccess = true;
     }
     message = response.message;
-    return register;
+    return registerSuccess;
   }
 
-  Future<bool> regiDoctor() async {
-    bool register = false;
-    final response = await registerDoctor(
-        nameController.text,
-        lastNameController.text,
-        emailController.text,
-        passwordController.text,
-        birthdayController.text,
-        cellPhoneController.text,
-        genderController.text,
-        idNumberController.text,
-        addresController.text,
-        specialityController.text,
-        descriptionController.text);
-    if (response.code == 1) {
-      register = true;
-    }
-    message = response.message;
-    return register;
+  Widget buildFormFields({bool isDoctor = false}) {
+    return FractionallySizedBox(
+      widthFactor: 0.9,
+      child: Column(
+        children: [
+          formText(
+              messageError: 'Please, enter your name here',
+              labelText: 'Name',
+              control: nameController,
+              icono: const Icon(Icons.person),
+              hintText: 'Enter your name here'),
+          formText(
+              messageError: 'Please, enter your last name here',
+              labelText: 'Last name',
+              hintText: 'Enter your last name, here',
+              icono: const Icon(Icons.person),
+              control: lastNameController),
+          formNumber(
+              'Please, enter your ID here',
+              'ID card',
+              'Enter your ID here',
+              const Icon(Icons.card_membership_rounded),
+              idNumberController),
+          formText(
+              messageError: 'Please, enter your email here',
+              labelText: 'E-mail',
+              hintText: 'Enter your email, here',
+              icono: const Icon(Icons.email),
+              control: emailController),
+          formPassword(
+              'Please, enter your password here',
+              'Password',
+              'Enter your password, here',
+              const Icon(Icons.security),
+              passwordController),
+          formDate(
+              'Please, enter your birthday here',
+              'Birthday',
+              'Enter your birthday here',
+              const Icon(Icons.calendar_today_outlined),
+              birthdayController,
+              context),
+          formText(
+              messageError: 'Please, enter gender',
+              labelText: 'Gender',
+              hintText: 'Enter your gender here',
+              icono: const Icon(Icons.male),
+              control: genderController),
+          formNumber(
+              'Please, enter your number of cellphone',
+              'Cellphone',
+              'Enter your cellphone here',
+              const Icon(Icons.phone),
+              cellPhoneController),
+          formText(
+              messageError: 'Please, enter your address here',
+              labelText: 'Address',
+              hintText: 'Enter your address here',
+              icono: const Icon(Icons.house_outlined),
+              control: addressController),
+          if (isDoctor)
+            formText(
+                messageError: 'Please, enter your speciality here',
+                labelText: 'Speciality',
+                hintText: 'Enter your speciality here',
+                icono: const Icon(Icons.medical_services),
+                control: specialityController),
+          if (isDoctor)
+            formText(
+                messageError: 'Please, enter your speciality description here',
+                labelText: 'Speciality description',
+                hintText: 'Enter your description here',
+                icono: const Icon(Icons.medical_information),
+                control: descriptionController),
+        ],
+      ),
+    );
   }
 
   @override
@@ -100,211 +177,75 @@ class _FormRegisterState extends State<FormRegister> {
         ),
         body: TabBarView(children: [
           Form(
-            key: _patientKey,
+            key: _patientFormKey,
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Center(
-                    child: primaryTitle('Patient'),
-                  ),
-                  formText(
-                      'Please, enter your name here',
-                      'Name',
-                      'Enter you name here',
-                      const Icon(Icons.person),
-                      nameController),
-                  formText(
-                      'Please, enter your last name here',
-                      'Last name',
-                      'Enter your last name, here',
-                      const Icon(Icons.person),
-                      lastNameController),
-                  formNumber(
-                      'Please, enter your ID here',
-                      'Id card',
-                      'Enter your ID, here',
-                      const Icon(Icons.card_membership_rounded),
-                      idNumberController),
-                  formText(
-                      'Please, enter your email here',
-                      'E-mail',
-                      'Enter your email, here',
-                      const Icon(Icons.email),
-                      emailController),
-                  formPassword(
-                      'Please, enter your password here',
-                      'Password',
-                      'Enter your password, here',
-                      const Icon(Icons.security),
-                      passwordController),
-                  formDate(
-                      'Please, enter your birthday here',
-                      'Birthday',
-                      'Enter your birthday here',
-                      const Icon(Icons.calendar_today_outlined),
-                      birthdayController),
-                  formText(
-                      'Please, enter gender',
-                      'Gender',
-                      'Enter your gender, here',
-                      const Icon(Icons.male),
-                      genderController),
-                  formNumber(
-                      'Please, enter your number of cellphone',
-                      'Cellphone',
-                      'Enter your cellphone here',
-                      const Icon(Icons.phone),
-                      cellPhoneController),
-                  formText(
-                      'Please, enter your address here',
-                      'Address',
-                      'Enter your address here',
-                      const Icon(Icons.house_outlined),
-                      addresController),
+                  Center(child: primaryTitle('Patient')),
+                  buildFormFields(isDoctor: false),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size(300, 48)),
-                      child: const Text(
-                        "Register",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        if (_patientKey.currentState!.validate()) {
-                          regiPatient().then((value) {
-                            if (value == true) {
-                              showDialogAlertAndRedirection(
-                                  context, 'Registered patient', message,
-                                  onPressed: () => {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const LogIn()))
-                                      });
-                            } else {
-                              showDialogAlert(context, 'Mistake', message);
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: FractionallySizedBox(
+                        widthFactor: 0.75,
+                        child: primaryButton(
+                          buttonText: "Register",
+                          onPressed: () {
+                            if (_patientFormKey.currentState!.validate()) {
+                              register(false).then((value) {
+                                if (value == true) {
+                                  showDialogAlertAndRedirection(
+                                      context, 'Registered patient', message,
+                                      onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LogIn()));
+                                  });
+                                } else {
+                                  showDialogAlert(context, 'Error', message);
+                                }
+                              });
                             }
-                          });
-                        }
-                      },
-                    ),
-                  )
+                          },
+                        ),
+                      ))
                 ],
               ),
             ),
           ),
           Form(
-            key: _doctorKey,
+            key: _doctorFormKey,
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Center(
-                    child: primaryTitle('Doctor'),
-                  ),
-                  formText(
-                      'Please, enter your name here',
-                      'Name',
-                      'Enter you name here',
-                      const Icon(Icons.person),
-                      nameController),
-                  formText(
-                      'Please, enter your last name here',
-                      'Last name',
-                      'Enter your last name, here',
-                      const Icon(Icons.person),
-                      lastNameController),
-                  formNumber(
-                      'Please, enter your ID here',
-                      'Id card',
-                      'Enter your ID, here',
-                      const Icon(Icons.card_membership_rounded),
-                      idNumberController),
-                  formText(
-                      'Please, enter your email here',
-                      'E-mail',
-                      'Enter your email, here',
-                      const Icon(Icons.email),
-                      emailController),
-                  formPassword(
-                      'Please, enter your password here',
-                      'Password',
-                      'Enter your password, here',
-                      const Icon(Icons.security),
-                      passwordController),
-                  formDate(
-                      'Please, enter your birthday here',
-                      'Birthday',
-                      'Enter your birthday here',
-                      const Icon(Icons.calendar_today_outlined),
-                      birthdayController),
-                  formText(
-                      'Please, enter gender',
-                      'Gender',
-                      'Enter your gender, here',
-                      const Icon(Icons.male),
-                      genderController),
-                  formNumber(
-                      'Please, enter your number of cellphone',
-                      'Cellphone',
-                      'Enter your cellphone here',
-                      const Icon(Icons.phone),
-                      cellPhoneController),
-                  formText(
-                      'Please, enter your address here',
-                      'Address',
-                      'Enter your address here',
-                      const Icon(Icons.house_outlined),
-                      addresController),
-                  formText(
-                      'Please, enter your speciality here',
-                      'Speciality',
-                      'Enter your speciality here',
-                      const Icon(Icons.medical_services),
-                      specialityController),
-                  formText(
-                      'Please, enter description speciality here',
-                      'Speciality description',
-                      'Enter your description speciality here',
-                      const Icon(Icons.medical_information),
-                      descriptionController),
+                  Center(child: primaryTitle('Doctor')),
+                  buildFormFields(isDoctor: true),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size(300, 48)),
-                      child: const Text(
-                        "Register",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        if (_doctorKey.currentState!.validate()) {
-                          regiDoctor().then((value) {
-                            if (value == true) {
-                              showDialogAlertAndRedirection(
-                                  context, 'Registered doctor', message,
-                                  onPressed: () => {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const LogIn()))
-                                      });
-                            } else {
-                              showDialogAlert(context, 'Mistake', message);
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: FractionallySizedBox(
+                        widthFactor: 0.75,
+                        child: primaryButton(
+                          buttonText: "Register",
+                          onPressed: () {
+                            if (_doctorFormKey.currentState!.validate()) {
+                              register(false).then((value) {
+                                if (value == true) {
+                                  showDialogAlertAndRedirection(
+                                      context, 'Registered doctor', message,
+                                      onPressed: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LogIn()));
+                                  });
+                                } else {
+                                  showDialogAlert(context, 'Error', message);
+                                }
+                              });
                             }
-                          });
-                        }
-                      },
-                    ),
-                  )
+                          },
+                        ),
+                      ))
                 ],
               ),
             ),

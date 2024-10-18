@@ -8,7 +8,7 @@ Widget primaryTitle(String title) {
       fontSize: 28.0,
       fontFamily: "Roboto",
       fontStyle: FontStyle.italic,
-      color: Colors.black,
+      color: Color(0xFF333333),
     ),
   );
 }
@@ -95,55 +95,6 @@ Widget listTab(String title, String description, String iconTab,
   );
 }
 
-Widget formText(String messageError, String labelText, String hintText,
-    Icon icono, TextEditingController control) {
-  return TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return messageError;
-      }
-      return null;
-    },
-    decoration:
-        InputDecoration(labelText: labelText, icon: icono, hintText: hintText),
-    keyboardType: TextInputType.text,
-    controller: control,
-  );
-}
-
-Widget formPassword(String messageError, String labelText, String hintText,
-    Icon icono, TextEditingController control) {
-  return TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return messageError;
-      }
-      return null;
-    },
-    decoration:
-        InputDecoration(labelText: labelText, icon: icono, hintText: hintText),
-    keyboardType: TextInputType.visiblePassword,
-    obscureText: true,
-    controller: control,
-  );
-}
-
-Widget formDate(String messageError, String labelText, String hintText,
-    Icon icono, TextEditingController control) {
-  return TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return messageError;
-      }
-      return null;
-    },
-    decoration:
-        InputDecoration(labelText: labelText, icon: icono, hintText: hintText),
-    keyboardType: TextInputType.datetime,
-    controller: control,
-  );
-}
-
 Widget textInmovible(TextEditingController controller, String fintText) {
   return TextFormField(
     controller: controller,
@@ -160,22 +111,6 @@ Widget textField(String label, TextEditingController controller) {
       filled: true,
       fillColor: Colors.white,
     ),
-  );
-}
-
-Widget formNumber(String messageError, String labelText, String hintText,
-    Icon icono, TextEditingController control) {
-  return TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return messageError;
-      }
-      return null;
-    },
-    decoration:
-        InputDecoration(labelText: labelText, icon: icono, hintText: hintText),
-    keyboardType: TextInputType.phone,
-    controller: control,
   );
 }
 
