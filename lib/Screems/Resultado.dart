@@ -4,6 +4,7 @@ import 'package:medi_pro_vision/Models/Diagnosis.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
+import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

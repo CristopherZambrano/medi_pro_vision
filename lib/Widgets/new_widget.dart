@@ -5,10 +5,19 @@ Widget primaryTitle(String title) {
     title,
     style: const TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 28.0,
-      fontFamily: "Roboto",
-      fontStyle: FontStyle.italic,
+      fontSize: 26,
       color: Color(0xFF333333),
+    ),
+  );
+}
+
+Widget descriptionString(String description) {
+  return Text(
+    description,
+    style: const TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 20,
+      color: Color(0xFF388E3C),
     ),
   );
 }
@@ -112,47 +121,6 @@ Widget textField(String label, TextEditingController controller) {
       fillColor: Colors.white,
     ),
   );
-}
-
-void showDialogAlert(BuildContext context, String title, String description) {
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(description),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cerrar'),
-            ),
-          ],
-        );
-      });
-}
-
-void showDialogAlertAndRedirection(
-    BuildContext context, String title, String description,
-    {required VoidCallback onPressed}) {
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(description),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                onPressed();
-              },
-              child: const Text('Cerrar'),
-            ),
-          ],
-        );
-      });
 }
 
 Widget diagnosisTab(String doctor, String diagnosis, String dateDiagnosis) {

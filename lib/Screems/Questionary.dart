@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Screems/Diagnosticos.dart';
 import 'package:medi_pro_vision/Screems/Resultado.dart';
+import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

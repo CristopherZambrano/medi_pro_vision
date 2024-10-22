@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/log_in_controller.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
+import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
+import 'package:medi_pro_vision/Widgets/textBox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medi_pro_vision/Widgets/botones.dart';
 
 class LogIn extends StatelessWidget {
   const LogIn({super.key});
@@ -42,70 +45,46 @@ class _LogInScreemState extends State<LogInScreem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Image(image: AssetImage('assets/log.png')),
-            Center(
-              child: primaryTitle('Log in'),
-            ),
-            const Padding(padding: EdgeInsets.all(10)),
-            Center(
-              child: TextField(
-                decoration: const InputDecoration(
-                    labelText: 'Enter your email',
-                    icon: Icon(Icons.person),
-                    hintText: 'Enter your email here'),
-                keyboardType: TextInputType.emailAddress,
-                controller: userController,
-              ),
-            ),
-            const Padding(padding: EdgeInsets.all(5)),
-            Center(
-              child: TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Enter your password',
-                  icon: Icon(Icons.lock),
-                  hintText: 'Enter your password here',
-                ),
-                obscureText: true,
-                controller: passwordController,
-              ),
-            ),
-            const Padding(padding: EdgeInsets.all(9)),
-            Center(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    minimumSize: const Size(300, 48)),
-                onPressed: _isButtonDisabled
-                    ? () => {
-                          setState(() {
-                            _isButtonDisabled = false;
-                            _textButton = 'Please wait';
-                          }),
-                          initSession(context),
-                          setState(() {
-                            _isButtonDisabled = true;
-                            _textButton = 'Get into';
-                          }),
-                        }
-                    : null,
-                child: Text(
-                  _textButton,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-            const Padding(padding: EdgeInsets.all(10)),
-          ],
+        body: SingleChildScrollView(
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Padding(padding: EdgeInsets.all(20)),
+        const Image(image: AssetImage('assets/log.png')),
+        Center(
+          child: primaryTitle('Log in'),
         ),
-      ),
-    );
+        const Padding(padding: EdgeInsets.all(10)),
+        FractionallySizedBox(
+          widthFactor: 0.9,
+          child: Column(
+            children: [
+              formText(
+                  messageError: 'Please enter your email',
+                  labelText: 'Email',
+                  control: userController,
+                  icono: const Icon(Icons.person)),
+              const Padding(padding: EdgeInsets.all(5)),
+              formPassword(
+                  'Please, enter your password',
+                  'Password',
+                  'Enter your password here',
+                  const Icon(Icons.lock),
+                  passwordController),
+              const Padding(padding: EdgeInsets.all(9)),
+            ],
+          ),
+        ),
+        FractionallySizedBox(
+          widthFactor: 0.75,
+          child: primaryButton(
+              buttonText: 'Get into',
+              onPressed: () {
+                initSession(context);
+              }),
+        )
+      ],
+    )));
   }
 
   void initSession(BuildContext context) {
@@ -133,7 +112,7 @@ class _LogInScreemState extends State<LogInScreem> {
       message = response.message;
       User user = parseUserString(jsonEncode(response.data.toString()));
       verifyTipeUser(user.id).then((int valor) {
-        prefs.setString('User', response.data.toString());
+        user.saveSession(user);
         prefs.setInt("TipeUser", valor);
       });
     }

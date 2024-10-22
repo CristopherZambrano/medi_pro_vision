@@ -144,3 +144,50 @@ Widget formNumber(String messageError, String labelText, String hintText,
     },
   );
 }
+
+Widget selectFormText(
+    {required String messageError,
+    required String labelText,
+    String? hintText,
+    Icon? icono,
+    required TextEditingController control,
+    required List<String> options,
+    bool autofocus = false}) {
+  return DropdownButtonFormField<String>(
+    decoration: InputDecoration(
+      labelText: labelText,
+      icon: icono,
+      hintText: hintText,
+      fillColor: const Color(0xFFF1F8FE),
+      border: OutlineInputBorder(
+        borderSide: const BorderSide(
+          color: Color(0xFFB3D4E6), // Borde de la caja de texto
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Color(0xFF007BFF), // Borde cuando está enfocada
+        ),
+      ),
+    ),
+    items: options.map((String option) {
+      return DropdownMenuItem<String>(
+        value: option,
+        child: Text(option),
+      );
+    }).toList(),
+    onChanged: (value) {
+      if (value != null) {
+        control.text =
+            value; // Actualiza el controlador con el valor seleccionado
+      }
+    },
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return messageError;
+      }
+      return null;
+    },
+  );
+}

@@ -7,6 +7,7 @@ import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/Resultado.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Widgets/TextBox.dart';
+import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

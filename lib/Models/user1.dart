@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
 class User {
   int id;
   String nombre;
@@ -9,6 +13,7 @@ class User {
   String direccion;
   String celular;
   String documento;
+  String? userName;
 
   User({
     required this.id,
@@ -81,5 +86,31 @@ class User {
       celular: celular,
       documento: documento,
     );
+  }
+
+  Future<void> saveSession(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    String userJson = jsonEncode(user.toJson());
+    await prefs.setString(
+        'user', userJson); // Guardar el string JSON del usuario
+  }
+
+  Future<User?> loadSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? userJson = prefs.getString('user');
+    if (userJson != null) {
+      Map<String, dynamic> userMap = jsonDecode(userJson);
+      return User.fromJson(userMap);
+    }
+    return null;
+  }
+
+  Future<void> clearSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user'); // Eliminar los datos del usuario
+  }
+
+  bool isLoggedIn() {
+    return userName != null;
   }
 }

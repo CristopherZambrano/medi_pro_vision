@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/register_controller.dart';
 import 'package:medi_pro_vision/Screems/log_in.dart';
-import 'package:medi_pro_vision/Widgets/TextBox.dart';
+import 'package:medi_pro_vision/Widgets/textBox.dart';
 import 'package:medi_pro_vision/Widgets/botones.dart';
+import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 
 class RegisterUser extends StatelessWidget {
@@ -82,36 +83,42 @@ class _FormRegisterState extends State<FormRegister> {
       widthFactor: 0.9,
       child: Column(
         children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.05),
           formText(
               messageError: 'Please, enter your name here',
               labelText: 'Name',
               control: nameController,
               icono: const Icon(Icons.person),
               hintText: 'Enter your name here'),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           formText(
               messageError: 'Please, enter your last name here',
               labelText: 'Last name',
               hintText: 'Enter your last name, here',
               icono: const Icon(Icons.person),
               control: lastNameController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           formNumber(
               'Please, enter your ID here',
               'ID card',
               'Enter your ID here',
               const Icon(Icons.card_membership_rounded),
               idNumberController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           formText(
               messageError: 'Please, enter your email here',
               labelText: 'E-mail',
               hintText: 'Enter your email, here',
               icono: const Icon(Icons.email),
               control: emailController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           formPassword(
               'Please, enter your password here',
               'Password',
               'Enter your password, here',
               const Icon(Icons.security),
               passwordController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           formDate(
               'Please, enter your birthday here',
               'Birthday',
@@ -119,24 +126,28 @@ class _FormRegisterState extends State<FormRegister> {
               const Icon(Icons.calendar_today_outlined),
               birthdayController,
               context),
-          formText(
-              messageError: 'Please, enter gender',
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+          selectFormText(
+              messageError: 'Please, select one gender',
               labelText: 'Gender',
-              hintText: 'Enter your gender here',
-              icono: const Icon(Icons.male),
-              control: genderController),
+              control: genderController,
+              options: ['Male', 'Female'],
+              icono: const Icon(Icons.male)),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           formNumber(
               'Please, enter your number of cellphone',
               'Cellphone',
               'Enter your cellphone here',
               const Icon(Icons.phone),
               cellPhoneController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           formText(
               messageError: 'Please, enter your address here',
               labelText: 'Address',
               hintText: 'Enter your address here',
               icono: const Icon(Icons.house_outlined),
               control: addressController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           if (isDoctor)
             formText(
                 messageError: 'Please, enter your speciality here',
@@ -144,6 +155,7 @@ class _FormRegisterState extends State<FormRegister> {
                 hintText: 'Enter your speciality here',
                 icono: const Icon(Icons.medical_services),
                 control: specialityController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           if (isDoctor)
             formText(
                 messageError: 'Please, enter your speciality description here',
@@ -151,6 +163,7 @@ class _FormRegisterState extends State<FormRegister> {
                 hintText: 'Enter your description here',
                 icono: const Icon(Icons.medical_information),
                 control: descriptionController),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         ],
       ),
     );
