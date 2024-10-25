@@ -33,12 +33,9 @@ class _LogInScreemState extends State<LogInScreem> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   String message = '';
-  late bool _isButtonDisabled;
-  String _textButton = 'Get into';
 
   @override
   void initState() {
-    _isButtonDisabled = true;
     super.initState();
   }
 

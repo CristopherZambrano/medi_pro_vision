@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Screems/log_in.dart';
-import 'package:medi_pro_vision/Screems/profile.dart';
 import 'package:medi_pro_vision/Screems/register_user.dart';
 import 'package:medi_pro_vision/Widgets/botones.dart';
 import 'package:shared_preferences/shared_preferences.dart';
