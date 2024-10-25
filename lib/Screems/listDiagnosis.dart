@@ -1,10 +1,6 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
-import 'package:medi_pro_vision/Models/listDiagnosis.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
-import 'package:medi_pro_vision/Screems/Resultado.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';

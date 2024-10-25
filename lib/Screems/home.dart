@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/Diagnosticos.dart';
-import 'package:medi_pro_vision/Screems/HistorialPatient.dart';
 import 'package:medi_pro_vision/Screems/Resultado.dart';
 import 'package:medi_pro_vision/Screems/listDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/profile.dart';
 import 'package:medi_pro_vision/Screems/tratamientos.dart';
+import 'package:medi_pro_vision/Widgets/Cards.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:medi_pro_vision/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,9 +17,10 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Home',
-      home: HomeScreem(),
+      home: const HomeScreem(),
+      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
     );
   }
 }
@@ -32,39 +33,37 @@ class HomeScreem extends StatefulWidget {
 }
 
 class _HomeScreemState extends State<HomeScreem> {
+  User? currentUser;
+  bool _isUserLoaded = false;
+
+  Future<void> chargeUser() async {
+    User user = User(
+      id: 0,
+      nombre: '',
+      apellido: '',
+      email: '',
+      fechaNacimiento: '',
+      password: '',
+      genero: '',
+      direccion: '',
+      celular: '',
+      documento: '',
+    );
+
+    currentUser = await user.loadSession();
+    setState(() {}); // Actualiza la interfaz cuando carga el usuario
+  }
+
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        child: MaterialApp(
-          title: 'MediProVision',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: const HomePage(),
-        ),
-        onWillPop: () async {
-          return await showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                    title: const Text('¿Seguro que quiere cerrar sesión?'),
-                    content: const Text('Perderas tu sesión actual'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Si'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('No'),
-                      ),
-                    ],
-                  ));
-        });
+    if (!_isUserLoaded) {
+      _isUserLoaded = true;
+      chargeUser(); // Ejecuta el método solo la primera vez
+    }
+    return const MaterialApp(
+      title: 'MediProVision',
+      home: HomePage(),
+    );
   }
 }
 
@@ -87,7 +86,6 @@ class HomePage extends StatelessWidget {
               onTap: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 int? tipeUser = prefs.getInt("TipeUser");
-                print(tipeUser);
                 if (tipeUser == 1) {
                   User user =
                       parseUserString(jsonEncode(prefs.getString('User')));
@@ -120,6 +118,19 @@ class HomePage extends StatelessWidget {
             }),
             listTab('Log out', 'Sign out of the account', 'assets/calendar.png',
                 onTap: () {
+              User user = User(
+                id: 0,
+                nombre: '',
+                apellido: '',
+                email: '',
+                fechaNacimiento: '',
+                password: '',
+                genero: '',
+                direccion: '',
+                celular: '',
+                documento: '',
+              );
+              user.clearSession();
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const MyApp()));
             }),

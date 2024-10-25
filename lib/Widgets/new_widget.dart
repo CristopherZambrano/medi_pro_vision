@@ -51,59 +51,6 @@ Widget verPorcentaje(double porcentaje) {
   );
 }
 
-Widget listTab(String title, String description, String iconTab,
-    {required VoidCallback onTap}) {
-  return Container(
-    height: 110,
-    decoration: BoxDecoration(
-        border: Border.all(color: Colors.black12, width: 2),
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.grey[200],
-        boxShadow: const [
-          BoxShadow(color: Colors.black, blurRadius: 6),
-        ]),
-    child: GestureDetector(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          const Padding(padding: EdgeInsets.all(8)),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                primaryTitle(title),
-                Text(
-                  description,
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.all(5),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image(
-                image: AssetImage(iconTab),
-                fit: BoxFit.contain,
-                height: 60,
-                width: 60,
-              ),
-            ],
-          ),
-        ],
-      ),
-      onTap: () {
-        onTap();
-      },
-    ),
-  );
-}
-
 Widget textInmovible(TextEditingController controller, String fintText) {
   return TextFormField(
     controller: controller,
