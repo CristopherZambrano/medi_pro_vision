@@ -191,3 +191,28 @@ Widget selectFormText(
     },
   );
 }
+
+Widget textInmovible(TextEditingController controller, String hintText) {
+  return TextFormField(
+    controller: controller,
+    enabled: false,
+    style: const TextStyle(
+      color: Color(0xFF666666),
+    ),
+    decoration: InputDecoration(
+      labelText: hintText,
+      labelStyle: const TextStyle(
+        color: Color(0xFF388E3C),
+      ),
+      filled: true,
+      fillColor: const Color(0xFFE6F4FA),
+      disabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(
+          color: Color(0xFFD0E4F7),
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+  );
+}

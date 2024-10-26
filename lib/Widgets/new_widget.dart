@@ -51,14 +51,6 @@ Widget verPorcentaje(double porcentaje) {
   );
 }
 
-Widget textInmovible(TextEditingController controller, String fintText) {
-  return TextFormField(
-    controller: controller,
-    enabled: false,
-    decoration: InputDecoration(labelText: fintText),
-  );
-}
-
 Widget textField(String label, TextEditingController controller) {
   return TextField(
     controller: controller,
