@@ -83,25 +83,29 @@ class HomePage extends StatelessWidget {
               'Diagnosis',
               'Performs a new diagnosis.',
               'assets/diagnostico.png',
-              onTap: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                int? tipeUser = prefs.getInt("TipeUser");
-                if (tipeUser == 1) {
-                  User user =
-                      parseUserString(jsonEncode(prefs.getString('User')));
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ListDiagnosis(idPatient: user.id)));
-                } else {
-                  if (tipeUser == 2) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const Diagnostico()));
+              onTap: () {
+                findTipeUser().then((value) {
+                  int tipeUser = value;
+                  if (tipeUser == 1) {
+                    findUser().then((value) {
+                      User user;
+                      Map<String, dynamic> userMap = jsonDecode(value);
+                      user = User.fromJson(userMap);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ListDiagnosis(idPatient: user.id)));
+                    });
+                  } else {
+                    if (tipeUser == 2) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Diagnostico()));
+                    }
                   }
-                }
+                });
               },
             ),
             listTab(
@@ -138,5 +142,25 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<int> findTipeUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? value = prefs.getInt("TipeUser");
+    if (value != null) {
+      return value;
+    } else {
+      return 0;
+    }
+  }
+
+  Future<String> findUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? value = prefs.getString("user");
+    if (value != null) {
+      return value;
+    } else {
+      return "";
+    }
   }
 }
