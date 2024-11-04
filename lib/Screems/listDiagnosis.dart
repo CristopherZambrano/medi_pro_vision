@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
-import 'package:medi_pro_vision/Widgets/new_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medi_pro_vision/Widgets/cards.dart';
 import 'dart:convert';
 
 class ListDiagnosis extends StatelessWidget {
-  int idPatient;
-  ListDiagnosis({super.key, required this.idPatient});
+  final int idPatient;
+  const ListDiagnosis({super.key, required this.idPatient});
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +18,8 @@ class ListDiagnosis extends StatelessWidget {
 }
 
 class ListDiagnosisScreem extends StatefulWidget {
-  int idPatient;
-  ListDiagnosisScreem({super.key, required this.idPatient});
+  final int idPatient;
+  const ListDiagnosisScreem({super.key, required this.idPatient});
 
   @override
   State<ListDiagnosisScreem> createState() => _ListDiagnosisScreemState();
@@ -36,7 +35,7 @@ class _ListDiagnosisScreemState extends State<ListDiagnosisScreem> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("List of diagnoses"),
-          backgroundColor: const Color(0xFF004BA0),
+          backgroundColor: const Color(0xFF007BFF),
         ),
         body: FutureBuilder(
           future: chargeHistory(),
@@ -50,10 +49,12 @@ class _ListDiagnosisScreemState extends State<ListDiagnosisScreem> {
                 itemCount: jsonList.length,
                 itemBuilder: (context, index) {
                   return diagnosisTab(
-                    jsonList[index]['doctor'].toString(),
-                    jsonList[index]['diagnostico'],
-                    jsonList[index]['fecha'],
-                  );
+                      doctor: jsonList[index]['doctor'].toString(),
+                      diagnosis: jsonList[index]['diagnostico'],
+                      dateDiagnosis: jsonList[index]['fecha'],
+                      onTap: () {
+                        print(jsonList[index]['idDiagnosis'].toString());
+                      });
                 },
               );
             }
@@ -62,7 +63,6 @@ class _ListDiagnosisScreemState extends State<ListDiagnosisScreem> {
   }
 
   Future<void> chargeHistory() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     final resp = await listarDiagnosticos(widget.idPatient.toString());
     try {
       jsonList = json.decode(resp);

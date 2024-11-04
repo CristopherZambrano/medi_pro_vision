@@ -4,6 +4,7 @@ import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/Questionary.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Screems/listDiagnosis.dart';
+import 'package:medi_pro_vision/Widgets/botones.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Diagnostico extends StatelessWidget {
@@ -12,15 +13,9 @@ class Diagnostico extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primaryColor: const Color(0xFF6200EE),
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: const Color(0xFF03DAC6),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF0EAE2),
-      ),
+      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
       title: 'Diagnostico',
-      home: DiagnosticoScreem(),
+      home: const DiagnosticoScreem(),
     );
   }
 }
@@ -36,35 +31,18 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
   bool isPatient = false;
   final TextEditingController _searchController = TextEditingController();
   User? _foundPatient;
-  late User user;
-
-  User parseUserString(String userString) {
-    List<String> parts = userString.split(', ');
-    int id = int.parse(parts[0].substring(parts[0].indexOf('=') + 1));
-    String nombre = parts[1].substring(parts[1].indexOf('=') + 1);
-    String apellido = parts[2].substring(parts[2].indexOf('=') + 1);
-    String email = parts[3].substring(parts[3].indexOf('=') + 1);
-    String fechaNacimiento = parts[4].substring(parts[4].indexOf('=') + 1);
-    String password = parts[5].substring(parts[5].indexOf('=') + 1);
-    String genero = parts[6].substring(parts[6].indexOf('=') + 1);
-    String direccion = parts[7].substring(parts[7].indexOf('=') + 1);
-    String celular = parts[8].substring(parts[8].indexOf('=') + 1);
-    String documento =
-        parts[9].substring(parts[9].indexOf('=') + 1, parts[9].length - 1);
-
-    return User(
-      id: id,
-      nombre: nombre,
-      apellido: apellido,
-      email: email,
-      fechaNacimiento: fechaNacimiento,
-      password: password,
-      genero: genero,
-      direccion: direccion,
-      celular: celular,
-      documento: documento,
-    );
-  }
+  User user = User(
+    id: 0,
+    nombre: '',
+    apellido: '',
+    email: '',
+    fechaNacimiento: '',
+    password: '',
+    genero: '',
+    direccion: '',
+    celular: '',
+    documento: '',
+  );
 
   void _search() async {
     final id = _searchController.text;
@@ -72,7 +50,7 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (response.code == 1) {
       setState(() {
-        user = parseUserString(response.data);
+        user = user.parseUserString(response.data);
         prefs.setString("Patient", id);
         isPatient = true;
         _foundPatient = user;
@@ -107,8 +85,9 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
     return Scaffold(
         appBar: AppBar(
             title: const Text("Patient Search"),
+            backgroundColor: const Color(0xFF007BFF),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const Home()));
@@ -130,15 +109,23 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _search,
-                  style: ElevatedButton.styleFrom(),
-                  child: const Text('Search'),
+                FractionallySizedBox(
+                  widthFactor: 0.45,
+                  child:
+                      primaryButton(buttonText: "Search", onPressed: _search),
                 ),
                 const SizedBox(height: 20),
                 if (_foundPatient != null) ...[
                   Card(
-                    color: const Color(0xFF03DAC6),
+                    color: const Color(0xFFFFFFFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: const BorderSide(
+                        color: Color(
+                            0xFFD0E4F7), // Borde de la tarjeta (azul claro)
+                        width: 1.5,
+                      ),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -154,56 +141,37 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
                       ),
                     ),
                   ),
-                  TextButton(
-                      onPressed: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Questionary()));
-                      },
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color(0xFF03DAC6)),
-                          padding: MaterialStateProperty.all<
-                                  EdgeInsetsGeometry>(
-                              const EdgeInsets.symmetric(horizontal: 16.0))),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.add),
-                          SizedBox(width: 8),
-                          Text(
-                            "New Diagnosis",
-                            style: TextStyle(color: Colors.white),
-                          )
-                        ],
-                      )),
-                  const SizedBox(),
-                  TextButton(
-                      onPressed: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ListDiagnosis(idPatient: user.id)));
-                      },
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.grey),
-                          padding: MaterialStateProperty.all<
-                                  EdgeInsetsGeometry>(
-                              const EdgeInsets.symmetric(horizontal: 16.0))),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.add),
-                          SizedBox(width: 8),
-                          Text(
-                            "See diagnoses",
-                            style: TextStyle(color: Colors.white),
-                          )
-                        ],
-                      )),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 0.65,
+                    child: primaryButton(
+                        buttonText: "New Diagnosis",
+                        icon: Icons.add,
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Questionary()));
+                        }),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: 0.6,
+                    child: secondaryButton(
+                        buttonText: "See diagnoses",
+                        icon: Icons.remove_red_eye,
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ListDiagnosis(idPatient: user.id)));
+                        }),
+                  ),
                 ],
               ],
             ),

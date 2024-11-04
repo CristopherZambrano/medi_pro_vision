@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/Diagnosticos.dart';
-import 'package:medi_pro_vision/Screems/Resultado.dart';
 import 'package:medi_pro_vision/Screems/listDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/profile.dart';
 import 'package:medi_pro_vision/Screems/tratamientos.dart';
