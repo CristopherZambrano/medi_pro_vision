@@ -50,7 +50,8 @@ class _DiagnosticoScreemState extends State<DiagnosticoScreem> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (response.code == 1) {
       setState(() {
-        user = user.parseUserString(response.data);
+        print(response.data.toString());
+        user = user.parseUserString(response.data.toString());
         prefs.setString("Patient", id);
         isPatient = true;
         _foundPatient = user;

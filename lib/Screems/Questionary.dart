@@ -2,41 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Screems/Diagnosticos.dart';
 import 'package:medi_pro_vision/Screems/Resultado.dart';
 import 'package:medi_pro_vision/Widgets/dialogs.dart';
-import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Questionary extends StatelessWidget {
-  Map<String, Color> customTheme = {
-    'primary': const Color(0xFF205ACF),
-    'primaryVariant': const Color(0xFF2DA537),
-    'secondary': const Color(0xFF000000),
-    'scaffoldBackgroundColor': const Color(0xFFFFFFFF),
-  };
-
-  Questionary({Key? key}) : super(key: key);
+  const Questionary({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primaryColor: customTheme['primary'],
-        primaryColorDark: customTheme['primaryVariant'],
-        scaffoldBackgroundColor: customTheme['scaffoldBackgroundColor'],
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            fixedSize: const Size.fromHeight(45),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(color: customTheme['secondary']!),
-          ),
-        ),
-      ),
+      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
       home: QuestionnaireScreen(),
     );
   }
@@ -48,37 +22,166 @@ class QuestionnaireScreen extends StatefulWidget {
 }
 
 class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
-  TextEditingController numericText = TextEditingController();
   int currentQuestionIndex = 0;
   int pedigree = 0;
   List<int> answer = [];
-  final List<String> questions = [
-    'Have you had an increase in thirst lately?', // Yes or No
-    'Do you go to the bathroom more frequently?',
-    'Have you ever felt tired or fatigued?',
-    'Have you lost weight lately?',
-    'Have you ever seen blurry?',
-    'Do your wounds take time to heal?',
-    'Has your appetite increased lately?',
-    'Have you had genital infections in the last semester?',
-    'Have you felt an inexplicable body itch?',
-    'Have you had sudden mood changes?',
-    'Have you felt tingling in your extremities?',
-    'Have you had cramps lately?',
-    'Have you noticed your hair falling out?',
-    'Are your parents diabetic?',
-    'Do you have siblings with diabetes?',
-    'Do you have children with diabetes?'
+  TextEditingController numericTextController = TextEditingController();
+
+  final List<Map<String, dynamic>> questions = [
+    {
+      'question': 'How many times do you go to the bathroom daily?',
+      'options': [
+        {'text': 'Less than 3 times', 'value': 0},
+        {'text': '3 to 5 times', 'value': 0},
+        {'text': 'More than 5 times', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Have you noticed an increase in thirst in recent weeks?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Yes, mildly', 'value': 0},
+        {'text': 'Yes, significantly', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'How often have you felt tired or fatigued in the past week?',
+      'options': [
+        {'text': 'Never', 'value': 0},
+        {'text': '1 to 3 times', 'value': 0},
+        {'text': 'More than 3 times', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question':
+          'Have you lost weight in the last month without changing diet or exercise?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Yes, less than 2 kg', 'value': 0},
+        {'text': 'Yes, more than 2 kg', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Have you experienced blurred vision recently?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Yes', 'value': 0},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'How long do your wounds take to heal?',
+      'options': [
+        {'text': 'Less than 1 week', 'value': 0},
+        {'text': 'Between 1 and 2 weeks', 'value': 1},
+        {'text': 'More than 2 weeks', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'How has your appetite been lately?',
+      'options': [
+        {'text': 'I have less appetite', 'value': 0},
+        {'text': 'Normal', 'value': 0},
+        {'text': 'Slightly increased', 'value': 1},
+        {'text': 'Greatly increased', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Have you had any genital infections in the last six months?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Yes, once', 'value': 0},
+        {'text': 'Yes, multiple times', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Have you experienced unexplained itching on your body?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Occasionally', 'value': 0},
+        {'text': 'Frequently', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Have you had sudden mood swings?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Occasionally', 'value': 0},
+        {'text': 'Frequently', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Do you feel tingling in your hands or feet?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Occasionally', 'value': 0},
+        {'text': 'Frequently', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Have you had cramps lately?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Occasionally', 'value': 0},
+        {'text': 'Frequently', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Have you noticed hair loss greater than normal?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'Yes, mildly', 'value': 0},
+        {'text': 'Yes, significantly', 'value': 1},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Are either of your parents diabetic?',
+      'options': [
+        {'text': 'No', 'value': 0},
+        {'text': 'One of my parents', 'value': 1},
+        {'text': 'Both', 'value': 2},
+      ],
+      'isNumeric': false,
+    },
+    {
+      'question': 'Do you have siblings diagnosed with diabetes?',
+      'isNumeric': true,
+    },
+    {
+      'question': 'Do you have children diagnosed with diabetes?',
+      'isNumeric': true,
+    },
+    {
+      'question': 'Enter your current glycemic index:',
+      'isNumeric': true,
+    },
+    {
+      'question': 'Enter your blood hemoglobin level (g/dL):',
+      'isNumeric': true,
+    },
   ];
 
   void _nextQuestion(int? resp) async {
-    if (currentQuestionIndex >= 13) {
-      pedigree = pedigree + (resp ?? 0);
-    } else {
-      if (resp != null) {
-        answer.add(resp);
-      }
+    if (questions[currentQuestionIndex]['isNumeric'] == true) {
+      final numericValue = int.tryParse(numericTextController.text) ?? 0;
+      answer.add(numericValue);
+      numericTextController.clear();
+    } else if (resp != null) {
+      answer.add(resp);
     }
+
     if (currentQuestionIndex < questions.length - 1) {
       setState(() {
         currentQuestionIndex++;
@@ -99,18 +202,19 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Questionnaire'),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              showDialogAlertAndRedirection(
-                  context, 'Cancelar', 'Se cancelaran todos los cambios',
-                  onPressed: () => {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const Diagnostico()))
-                      });
-            },
-          )),
+        title: const Text('Questionnaire'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            showDialogAlertAndRedirection(
+                context, 'Cancelar', 'Se cancelarán todos los cambios',
+                onPressed: () => {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const Diagnostico()))
+                    });
+          },
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -118,38 +222,39 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
             Expanded(
               child: Center(
                 child: Text(
-                  questions[currentQuestionIndex],
+                  questions[currentQuestionIndex]['question'],
                   textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18.0),
                 ),
               ),
             ),
-            if (currentQuestionIndex < 13)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  ElevatedButton(
-                    onPressed: () => _nextQuestion(1),
-                    child: const Text('Yes'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _nextQuestion(0),
-                    child: const Text('No'),
-                  ),
-                ],
-              )
-            else
+            if (questions[currentQuestionIndex]['isNumeric'] == true)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50.0),
                 child: TextFormField(
-                  controller: numericText,
+                  controller: numericTextController,
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (_) =>
-                      _nextQuestion(int.tryParse(numericText.text)),
                   decoration: const InputDecoration(
-                    labelText: 'Enter value',
-                    hintText: 'Numeric value',
+                    labelText: 'Enter the value',
+                    hintText: 'Example: 1',
                   ),
+                  onFieldSubmitted: (_) => _nextQuestion(null),
                 ),
+              )
+            else
+              ...List<Widget>.generate(
+                questions[currentQuestionIndex]['options'].length,
+                (index) {
+                  final option =
+                      questions[currentQuestionIndex]['options'][index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: ElevatedButton(
+                      onPressed: () => _nextQuestion(option['value']),
+                      child: Text(option['text']),
+                    ),
+                  );
+                },
               ),
           ],
         ),
