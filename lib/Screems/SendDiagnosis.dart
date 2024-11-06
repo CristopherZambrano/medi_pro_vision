@@ -10,20 +10,7 @@ class sendTreatment extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tratamiento Diabético',
-      theme: ThemeData(
-        primaryColor: const Color(0xFF6200EE),
-        scaffoldBackgroundColor: const Color(0xFFF0F0F0),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            minimumSize: Size.fromHeight(45),
-          ),
-        ),
-      ),
+      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
       home: const TreatmentSelectionPage(),
     );
   }
@@ -43,14 +30,14 @@ class _TreatmentSelectionPageState extends State<TreatmentSelectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Seleccione su Tratamiento'),
-        backgroundColor: const Color(0xFF6200EE),
+        title: const Text('Select a treatment'),
+        backgroundColor: const Color(0xFF007BFF),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ListTile(
-            title: Text('Cambio de Dieta'),
+            title: const Text('Change of diet'),
             leading: Radio<String>(
               value: 'diet',
               groupValue: _selectedTreatment,
@@ -62,7 +49,7 @@ class _TreatmentSelectionPageState extends State<TreatmentSelectionPage> {
             ),
           ),
           ListTile(
-            title: Text('Ingesta de Fármacos'),
+            title: const Text('Drug intake'),
             leading: Radio<String>(
               value: 'medication',
               groupValue: _selectedTreatment,
@@ -74,7 +61,7 @@ class _TreatmentSelectionPageState extends State<TreatmentSelectionPage> {
             ),
           ),
           ListTile(
-            title: Text('Inyecciones de Insulina'),
+            title: const Text('Insulin injections'),
             leading: Radio<String>(
               value: 'insulin',
               groupValue: _selectedTreatment,

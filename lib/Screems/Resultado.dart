@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/Diagnosis.dart';
+import 'package:medi_pro_vision/Models/user.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
@@ -41,7 +44,7 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
   late Diagnosis diagno;
   late double prom = 0;
   bool isloading = true;
-  User userTime = User(
+  User user = User(
     id: 0,
     nombre: '',
     apellido: '',
@@ -63,17 +66,22 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
 
   Future<int> sendDiagnosis(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    User user = userTime.parseUserString(prefs.getString("user") ?? "");
-    final response =
+    String? dataUser = prefs.getString('user');
+    if (dataUser != null) {
+      Map<String, dynamic> userMap = jsonDecode(dataUser);
+      user = User.fromJson(userMap);
+    }
+    /*final response =
         await guardarDiagnostico(us.id, "Diabetico", user.id.toString());
-    return response.code;
+    return response;*/
+    return 2;
   }
 
   Future<void> userCharge() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final response =
         await buscarPaciente(prefs.getString('Patient').toString());
-    us = userTime.parseUserString(response.data);
+    us = user.parseUserString(response.data);
     setState(() {
       name = '${us.nombre} ${us.apellido}';
       edad = calcularEdad(us.fechaNacimiento);
