@@ -4,6 +4,7 @@ import 'package:medi_pro_vision/Models/Diagnosis.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
+import 'package:medi_pro_vision/Widgets/botones.dart';
 import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/new_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,33 +13,12 @@ class Resultado extends StatelessWidget {
   List<int> answer = [];
   Resultado({super.key, required this.answer});
 
-  Map<String, Color> customTheme = {
-    'primary': const Color(0xFF1976D2),
-    'primaryVariant': const Color(0xFF004BA0),
-    'secondary': const Color(0xFFFFA000),
-    'scaffoldBackgroundColor': const Color(0xFFF3F4F6),
-  };
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Diabetes Risk Assessment',
-      theme: ThemeData(
-        primaryColor: customTheme['primary'],
-        scaffoldBackgroundColor: customTheme['scaffoldBackgroundColor'],
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 45),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-      ),
+      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
       home: DiabetesRiskScreen(
-        customTheme: customTheme,
         answer: answer,
       ),
     );
@@ -48,11 +28,8 @@ class Resultado extends StatelessWidget {
 //Statefull
 
 class DiabetesRiskScreen extends StatefulWidget {
-  final Map<String, Color> customTheme;
   List<int> answer = [];
-
-  DiabetesRiskScreen({required this.customTheme, required this.answer});
-
+  DiabetesRiskScreen({required this.answer});
   _DiabetesRiskScreemState createState() => _DiabetesRiskScreemState();
 }
 
@@ -64,32 +41,31 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
   late Diagnosis diagno;
   late double prom = 0;
   bool isloading = true;
+  User userTime = User(
+    id: 0,
+    nombre: '',
+    apellido: '',
+    email: '',
+    fechaNacimiento: '',
+    password: '',
+    genero: '',
+    direccion: '',
+    celular: '',
+    documento: '',
+  );
 
   @override
   void initState() {
     super.initState();
-    prom = (calcularPromedio(widget.answer) * 100);
     userCharge();
-  }
-
-  double calcularPromedio(List<int> lista) {
-    if (lista.isEmpty) {
-      return 0; // Devuelve 0 si la lista está vacía para evitar una división por cero
-    }
-    int suma = 0;
-    for (int numero in lista) {
-      suma += numero;
-    }
-    double promedio = suma / lista.length;
-    return promedio;
+    prom = calcularProbabilidadDiabetes(widget.answer, pedigree);
   }
 
   Future<int> sendDiagnosis(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    User user = parseUserString(prefs.getString("User") ?? "");
+    User user = userTime.parseUserString(prefs.getString("user") ?? "");
     final response =
         await guardarDiagnostico(us.id, "Diabetico", user.id.toString());
-    print(response.message);
     return response.code;
   }
 
@@ -97,11 +73,11 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final response =
         await buscarPaciente(prefs.getString('Patient').toString());
-    us = parseUserString(response.data);
+    us = userTime.parseUserString(response.data);
     setState(() {
       name = '${us.nombre} ${us.apellido}';
       edad = calcularEdad(us.fechaNacimiento);
-      pedigree = 0.075 * edad + 0.212 * (prefs.getInt("pedigree") ?? 0);
+      pedigree = 0.075 * edad + 0.212 * (prefs.getDouble("pedigree") ?? 0);
       isloading = false;
     });
   }
@@ -119,12 +95,86 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
     return edad;
   }
 
+  double calcularProbabilidadDiabetes(List<int> answer, double pedigree) {
+    double puntajeTotal = 0.0;
+    for (int i = 0; i < answer.length; i++) {
+      switch (i) {
+        case 0: // Frecuencia urinaria
+          puntajeTotal += answer[i] == 1 ? 5 : 0;
+          break;
+        case 1: // Aumento de la sed
+          puntajeTotal += answer[i] == 1 ? 5 : 0;
+          break;
+        case 2: // Cansancio o fatiga
+          puntajeTotal += answer[i] == 1 ? 5 : 0;
+          break;
+        case 3: // Pérdida de peso sin razón aparente
+          puntajeTotal += answer[i] == 1 ? 7 : 0;
+          break;
+        case 4: // Visión borrosa
+          puntajeTotal += answer[i] == 1 ? 4 : 0;
+          break;
+        case 5: // Tiempo de cicatrización
+          puntajeTotal += answer[i] > 0 ? 6 : 0;
+          break;
+        case 6: // Apetito
+          puntajeTotal += answer[i] > 0 ? 5 : 0;
+          break;
+        case 7: // Infecciones genitales
+          puntajeTotal += answer[i] == 1 ? 5 : 0;
+          break;
+        case 8: // Picazón sin explicación
+          puntajeTotal += answer[i] == 1 ? 5 : 0;
+          break;
+        case 9: // Cambios de humor repentinos
+          puntajeTotal += answer[i] == 1 ? 4 : 0;
+          break;
+        case 10: // Hormigueo en manos o pies
+          puntajeTotal += answer[i] == 1 ? 5 : 0;
+          break;
+        case 11: // Calambres
+          puntajeTotal += answer[i] == 1 ? 3 : 0;
+          break;
+        case 12: // Pérdida de cabello
+          puntajeTotal += answer[i] == 1 ? 4 : 0;
+          break;
+        case 13: // Antecedentes familiares de diabetes (padres)
+          puntajeTotal += answer[i] == 1 ? 7 : (answer[i] == 2 ? 10 : 0);
+          break;
+        case 14: // Número de hermanos con diabetes
+          puntajeTotal += answer[i] *
+              3; // Incrementa puntaje basado en cantidad de hermanos
+          break;
+        case 15: // Número de hijos con diabetes
+          puntajeTotal +=
+              answer[i] * 3; // Incrementa puntaje basado en cantidad de hijos
+          break;
+        case 16: // Índice glucémico actual
+          puntajeTotal += (answer[i] > 120)
+              ? 10
+              : 0; // Puntaje alto si es superior al rango normal
+          break;
+        case 17: // Hemoglobina
+          puntajeTotal += (answer[i] < 12)
+              ? 5
+              : 0; // Puntaje alto si está por debajo del rango normal
+          break;
+        default:
+          break;
+      }
+    }
+    puntajeTotal += pedigree * 10;
+    double probabilidad = (puntajeTotal / 100) * 100;
+    probabilidad = probabilidad.clamp(0, 100);
+    return probabilidad;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Risk Assessment'),
-          backgroundColor: const Color(0xFF004BA0),
+          backgroundColor: const Color(0xFF007BFF),
         ),
         body: isloading
             ? const Center(child: CircularProgressIndicator())
@@ -152,45 +202,43 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                     Center(
                       child: verPorcentaje(prom),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Row(
                       children: <Widget>[
                         Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              sendDiagnosis(context).then((value) {
-                                if (value == 1) {
-                                  showDialogAlert(context, "Error",
-                                      "Error when entering diagnosis");
-                                } else {
-                                  showDialogAlertAndRedirection(
-                                      context,
-                                      "Succesfully",
-                                      "Diagnosis entered correctly",
-                                      onPressed: () {
-                                    Navigator.push(
+                          child: primaryButton(
+                              buttonText: "Positive diabetic",
+                              onPressed: () {
+                                sendDiagnosis(context).then((value) {
+                                  if (value == 1) {
+                                    showDialogAlert(context, "Error",
+                                        "Error when entering diagnosis");
+                                  } else {
+                                    showDialogAlertAndRedirection(
                                         context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const sendTreatment()));
-                                  });
-                                }
-                              });
-                            },
-                            child: const Text('Positive diabetic'),
-                          ),
+                                        "Succesfully",
+                                        "Diagnosis entered correctly",
+                                        onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const sendTreatment()));
+                                    });
+                                  }
+                                });
+                              }),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: ElevatedButton(
+                          child: secondaryButton(
+                            buttonText: "Not diabetic",
                             onPressed: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => const Home()));
                             },
-                            style: ElevatedButton.styleFrom(),
-                            child: const Text('Not diabetic'),
                           ),
                         ),
                       ],
@@ -199,32 +247,4 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                 ),
               ));
   }
-}
-
-User parseUserString(String userString) {
-  List<String> parts = userString.split(', ');
-  int id = int.parse(parts[0].substring(parts[0].indexOf('=') + 1));
-  String nombre = parts[1].substring(parts[1].indexOf('=') + 1);
-  String apellido = parts[2].substring(parts[2].indexOf('=') + 1);
-  String email = parts[3].substring(parts[3].indexOf('=') + 1);
-  String fechaNacimiento = parts[4].substring(parts[4].indexOf('=') + 1);
-  String password = parts[5].substring(parts[5].indexOf('=') + 1);
-  String genero = parts[6].substring(parts[6].indexOf('=') + 1);
-  String direccion = parts[7].substring(parts[7].indexOf('=') + 1);
-  String celular = parts[8].substring(parts[8].indexOf('=') + 1);
-  String documento =
-      parts[9].substring(parts[9].indexOf('=') + 1, parts[9].length - 1);
-
-  return User(
-    id: id,
-    nombre: nombre,
-    apellido: apellido,
-    email: email,
-    fechaNacimiento: fechaNacimiento,
-    password: password,
-    genero: genero,
-    direccion: direccion,
-    celular: celular,
-    documento: documento,
-  );
 }

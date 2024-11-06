@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/log_in_controller.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
-import 'package:medi_pro_vision/Screems/Resultado.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Widgets/botones.dart';
 import 'package:medi_pro_vision/Widgets/dialogs.dart';
@@ -45,6 +44,18 @@ class _ProfileScreemState extends State<ProfileScreem> {
   TextEditingController passwordOldController = TextEditingController();
   TextEditingController passwordNewController = TextEditingController();
   TextEditingController passwordNewOk = TextEditingController();
+  User userTime = User(
+    id: 0,
+    nombre: '',
+    apellido: '',
+    email: '',
+    fechaNacimiento: '',
+    password: '',
+    genero: '',
+    direccion: '',
+    celular: '',
+    documento: '',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +258,7 @@ class _ProfileScreemState extends State<ProfileScreem> {
   Future<bool> editProfile() async {
     bool changed = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    User us = parseUserString(prefs.getString('user').toString());
+    User us = userTime.parseUserString(prefs.getString('user').toString());
     final response = await editUser(us.id.toString(), nameNew.text,
         lastNameNew.text, addressNew.text, emailNew.text, phoneNew.text);
     if (response.code == 1) {
@@ -264,7 +275,7 @@ class _ProfileScreemState extends State<ProfileScreem> {
 
   Future<String> modifiedPassword() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    User us = parseUserString(prefs.getString('User').toString());
+    User us = userTime.parseUserString(prefs.getString('user').toString());
     if (passwordNewController.text == passwordNewOk) {
       return "Password no valida";
     } else {

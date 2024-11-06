@@ -23,7 +23,7 @@ class QuestionnaireScreen extends StatefulWidget {
 
 class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
   int currentQuestionIndex = 0;
-  int pedigree = 0;
+  double pedigree = 0;
   List<int> answer = [];
   TextEditingController numericTextController = TextEditingController();
 
@@ -177,9 +177,23 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
     if (questions[currentQuestionIndex]['isNumeric'] == true) {
       final numericValue = int.tryParse(numericTextController.text) ?? 0;
       answer.add(numericValue);
+      if (currentQuestionIndex ==
+          questions.indexWhere((q) =>
+              q['question'] ==
+              'Do you have siblings diagnosed with diabetes?')) {
+        pedigree += numericValue * 0.5; // Ajusta el factor según tu criterio
+      }
       numericTextController.clear();
     } else if (resp != null) {
       answer.add(resp);
+      if (questions[currentQuestionIndex]['question'] ==
+          'Are either of your parents diabetic?') {
+        if (resp == 1) {
+          pedigree += 0.7; // Si uno de los padres tiene diabetes
+        } else if (resp == 2) {
+          pedigree += 1.2; // Si ambos padres tienen diabetes
+        }
+      }
     }
 
     if (currentQuestionIndex < questions.length - 1) {
@@ -188,7 +202,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
       });
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setInt("pedigree", pedigree);
+      prefs.setDouble("pedigree", pedigree);
       Navigator.push(
           context,
           MaterialPageRoute(
