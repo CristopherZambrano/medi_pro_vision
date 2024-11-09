@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Screems/log_in.dart';
 import 'package:medi_pro_vision/Screems/register_user.dart';
@@ -21,7 +22,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
       title: "MediProVision",
-      home: user != null ? const Home() : const StartPage(),
+      home: user != null
+          ? const SendTreatment(treatmentId: 1)
+          : const StartPage(),
     );
   }
 }

@@ -1,148 +1,147 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/medicineController.dart';
 import 'package:medi_pro_vision/Models/Medicamentos.dart';
-import 'package:medi_pro_vision/Screems/home.dart';
+import 'package:medi_pro_vision/Widgets/botones.dart';
 
-class sendTreatment extends StatelessWidget {
-  const sendTreatment({super.key});
+class SendTreatment extends StatelessWidget {
+  final int treatmentId; // Recibe el ID del tratamiento
+
+  const SendTreatment({Key? key, required this.treatmentId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tratamiento Diabético',
+      title: 'Diabetic Treatment',
       theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFE6F4FA)),
-      home: const TreatmentSelectionPage(),
+      home: TreatmentSelectionPage(treatmentId: treatmentId),
     );
   }
 }
 
 class TreatmentSelectionPage extends StatefulWidget {
-  const TreatmentSelectionPage({Key? key}) : super(key: key);
+  final int treatmentId; // Usado para mandar a la base de datos
+
+  const TreatmentSelectionPage({Key? key, required this.treatmentId})
+      : super(key: key);
 
   @override
   _TreatmentSelectionPageState createState() => _TreatmentSelectionPageState();
 }
 
 class _TreatmentSelectionPageState extends State<TreatmentSelectionPage> {
-  String? _selectedTreatment;
+  bool _showDietDetails = false;
+  bool _showMedicationDetails = false;
+  bool _showInsulinDetails = false;
+
+  final Map<String, dynamic> treatmentDetails = {
+    "diet": [
+      "Sugars and sweets",
+      "Sugary drinks",
+      "Refined flours",
+      "Fast food"
+    ],
+    "medication": [], // Aquí se almacenarán los medicamentos seleccionados
+    "insulinDose": 0.0, // Dosis de insulina
+  };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select a treatment'),
+        title: const Text('Select Treatments'),
         backgroundColor: const Color(0xFF007BFF),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ListTile(
-            title: const Text('Change of diet'),
-            leading: Radio<String>(
-              value: 'diet',
-              groupValue: _selectedTreatment,
-              onChanged: (value) {
-                setState(() {
-                  _selectedTreatment = value;
-                });
-              },
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ListTile(
+              title: const Text('Dietary Changes'),
+              trailing: IconButton(
+                icon: Icon(
+                    _showDietDetails ? Icons.expand_less : Icons.expand_more),
+                onPressed: () {
+                  setState(() {
+                    _showDietDetails = !_showDietDetails;
+                  });
+                },
+              ),
             ),
-          ),
-          ListTile(
-            title: const Text('Drug intake'),
-            leading: Radio<String>(
-              value: 'medication',
-              groupValue: _selectedTreatment,
-              onChanged: (value) {
-                setState(() {
-                  _selectedTreatment = value;
-                });
-              },
+            if (_showDietDetails)
+              DietPageContent(treatmentDetails: treatmentDetails),
+            ListTile(
+              title: const Text('Medication Intake'),
+              trailing: IconButton(
+                icon: Icon(_showMedicationDetails
+                    ? Icons.expand_less
+                    : Icons.expand_more),
+                onPressed: () {
+                  setState(() {
+                    _showMedicationDetails = !_showMedicationDetails;
+                  });
+                },
+              ),
             ),
-          ),
-          ListTile(
-            title: const Text('Insulin injections'),
-            leading: Radio<String>(
-              value: 'insulin',
-              groupValue: _selectedTreatment,
-              onChanged: (value) {
-                setState(() {
-                  _selectedTreatment = value;
-                });
-              },
+            if (_showMedicationDetails)
+              MedicationPageContent(treatmentDetails: treatmentDetails),
+            ListTile(
+              title: const Text('Insulin Injections'),
+              trailing: IconButton(
+                icon: Icon(_showInsulinDetails
+                    ? Icons.expand_less
+                    : Icons.expand_more),
+                onPressed: () {
+                  setState(() {
+                    _showInsulinDetails = !_showInsulinDetails;
+                  });
+                },
+              ),
             ),
-          ),
-          FloatingActionButton.extended(
-            onPressed: () {
-              _navigateToSelectedTreatment(context);
-            },
-            backgroundColor: const Color(0xFF03DAC6),
-            label: const Text('Continuar'),
-            icon: const Icon(Icons.check),
-            extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-          ),
-        ],
+            if (_showInsulinDetails)
+              InsulinPageContent(treatmentDetails: treatmentDetails),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          await saveTreatment(widget.treatmentId, treatmentDetails);
+        },
+        backgroundColor: const Color(0xFF03DAC6),
+        label: const Text('Save Treatment'),
+        icon: const Icon(Icons.save),
       ),
     );
   }
-
-  void _navigateToSelectedTreatment(BuildContext context) {
-    switch (_selectedTreatment) {
-      case 'diet':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DietPage()),
-        );
-        break;
-      case 'medication':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MedicationPage()),
-        );
-        break;
-      case 'insulin':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => InsulinPage()),
-        );
-        break;
-    }
-  }
 }
 
-class DietPage extends StatelessWidget {
+class DietPageContent extends StatelessWidget {
+  final Map<String, dynamic> treatmentDetails;
+
+  const DietPageContent({Key? key, required this.treatmentDetails})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Cambio de Dieta')),
-      body: ListView(
-        children: [
-          ListTile(title: Text('Azúcares y dulces')),
-          ListTile(title: Text('Bebidas azucaradas')),
-          ListTile(title: Text('Harinas refinadas')),
-          ListTile(title: Text('Fast food')),
-          FloatingActionButton.extended(
-            onPressed: () async {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Home()));
-            },
-            backgroundColor: const Color(0xFF03DAC6),
-            label: const Text('Registrar tratamiento'),
-            icon: const Icon(Icons.add),
-            extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-          )
-        ],
-      ),
+    return Column(
+      children: treatmentDetails["diet"]
+          .map<Widget>((item) => ListTile(title: Text(item)))
+          .toList(),
     );
   }
 }
 
-class MedicationPage extends StatefulWidget {
+class MedicationPageContent extends StatefulWidget {
+  final Map<String, dynamic> treatmentDetails;
+
+  const MedicationPageContent({Key? key, required this.treatmentDetails})
+      : super(key: key);
+
   @override
-  _MedicationPageState createState() => _MedicationPageState();
+  _MedicationPageContentState createState() => _MedicationPageContentState();
 }
 
-class _MedicationPageState extends State<MedicationPage> {
+class _MedicationPageContentState extends State<MedicationPageContent> {
   late Future<List<Medicine>> medications;
   List<Medicine> selectedMedications = [];
 
@@ -155,88 +154,79 @@ class _MedicationPageState extends State<MedicationPage> {
   void toggleSelection(Medicine medicine, bool isSelected) {
     setState(() {
       if (isSelected) {
-        selectedMedications.add(
-            medicine); // Agregar el medicamento a la lista de seleccionados
+        selectedMedications.add(medicine);
       } else {
-        selectedMedications
-            .remove(medicine); // Remover el medicamento si se deselecciona
+        selectedMedications.remove(medicine);
       }
+      widget.treatmentDetails["medication"] = selectedMedications;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Ingesta de Fármacos')),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<Medicine>>(
-              future: medications,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                      child: Text('No se encontraron medicamentos'));
-                } else {
-                  List<Medicine> medicinas = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: medicinas.length,
-                    itemBuilder: (context, index) {
-                      Medicine medicine = medicinas[index];
-                      bool isSelected = selectedMedications.contains(medicine);
-
-                      return ListTile(
-                        title: Text(medicine.tradeName),
-                        subtitle: Text(medicine.genericName),
-                        trailing: Checkbox(
-                          value: isSelected,
-                          onChanged: (bool? value) {
-                            toggleSelection(medicine, value ?? false);
-                          },
-                        ),
-                      );
+    return Column(children: [
+      FutureBuilder<List<Medicine>>(
+        future: medications,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No medications found'));
+          } else {
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                Medicine medicine = snapshot.data![index];
+                bool isSelected = selectedMedications.contains(medicine);
+                return ListTile(
+                  title: Text(medicine.tradeName),
+                  subtitle: Text(medicine.genericName + medicine.presentation),
+                  trailing: Checkbox(
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      toggleSelection(medicine, value ?? false);
                     },
-                  );
-                }
+                  ),
+                );
               },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(
-                16.0), // Agrega espacio alrededor de los botones
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment
-                  .stretch, // Asegura que los botones ocupen todo el ancho
-              children: [
-                TextButton(
-                  onPressed: () {
-                    showDialog(
+            );
+          }
+        },
+      ),
+      Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: FractionallySizedBox(
+            widthFactor: 0.75,
+            child: primaryButton(
+                buttonText: "Add medication",
+                onPressed: () {
+                  showDialog(
                       context: context,
-                      builder: (BuildContext context) {
+                      builder: (BuildContext contex) {
                         String tradeName = '';
                         String genericName = '';
-                        String presentation = 'Tabletas'; // Valor inicial
+                        String presentation = 'Tablets'; // Valor inicial
                         double concentration = 0;
 
                         return AlertDialog(
-                          title: const Text('Agregar Medicamento'),
+                          title: const Text('Add Medication'),
                           content: SingleChildScrollView(
                             child: Column(
                               children: [
                                 TextField(
                                   decoration: const InputDecoration(
-                                      labelText: 'Nombre Comercial'),
+                                      labelText: 'Trade name'),
                                   onChanged: (value) {
                                     tradeName = value;
                                   },
                                 ),
                                 TextField(
                                   decoration: const InputDecoration(
-                                      labelText: 'Nombre Genérico'),
+                                      labelText: 'Generic name'),
                                   onChanged: (value) {
                                     genericName = value;
                                   },
@@ -244,11 +234,11 @@ class _MedicationPageState extends State<MedicationPage> {
                                 DropdownButtonFormField<String>(
                                   value: presentation,
                                   decoration: const InputDecoration(
-                                      labelText: 'Presentación'),
+                                      labelText: 'Presentation'),
                                   onChanged: (String? newValue) {
                                     presentation = newValue!;
                                   },
-                                  items: ['Tabletas', 'Jarabe', 'Inyección']
+                                  items: ['Tablets', 'Syrup', 'Injection']
                                       .map<DropdownMenuItem<String>>(
                                           (String value) {
                                     return DropdownMenuItem<String>(
@@ -259,7 +249,7 @@ class _MedicationPageState extends State<MedicationPage> {
                                 ),
                                 TextField(
                                   decoration: const InputDecoration(
-                                      labelText: 'Concentración (MG)'),
+                                      labelText: 'Concentration (MG)'),
                                   keyboardType: TextInputType.number,
                                   onChanged: (value) {
                                     concentration = double.tryParse(value) ?? 0;
@@ -271,10 +261,9 @@ class _MedicationPageState extends State<MedicationPage> {
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context)
-                                    .pop(); // Cierra el modal sin guardar
+                                Navigator.of(context).pop();
                               },
-                              child: const Text('Cancelar'),
+                              child: const Text('Cancel'),
                             ),
                             TextButton(
                               onPressed: () {
@@ -288,99 +277,65 @@ class _MedicationPageState extends State<MedicationPage> {
                                       presentation:
                                           "$presentation${concentration}MG");
                                   saveMedicine(med);
-                                  Navigator.of(context).pop();
+                                  MaterialPageRoute(
+                                      builder: (context) => const SendTreatment(
+                                            treatmentId: 1,
+                                          ));
                                 }
                               },
-                              child: const Text('Guardar'),
+                              child: const Text('Save'),
                             ),
                           ],
                         );
-                      },
-                    );
-                  },
-                  child: const Text('Agregar Medicamento'),
-                ),
-                const SizedBox(height: 10), // Espacio entre los botones
-                TextButton(
-                  onPressed: () {
-                    if (selectedMedications.isNotEmpty) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Medicamentos seleccionados'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: selectedMedications
-                                  .map((medicine) => Text(medicine.tradeName))
-                                  .toList(),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cerrar'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  },
-                  child: const Text('Ver Selección'),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+                      });
+                }),
+          ))
+    ]);
   }
 }
 
-class InsulinPage extends StatefulWidget {
+class InsulinPageContent extends StatefulWidget {
+  final Map<String, dynamic> treatmentDetails;
+
+  const InsulinPageContent({Key? key, required this.treatmentDetails})
+      : super(key: key);
+
   @override
-  _InsulinPageState createState() => _InsulinPageState();
+  _InsulinPageContentState createState() => _InsulinPageContentState();
 }
 
-class _InsulinPageState extends State<InsulinPage> {
-  double _insulinDose = 0;
+class _InsulinPageContentState extends State<InsulinPageContent> {
+  double _insulinDose = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Inyecciones de Insulina')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Slider(
-            value: _insulinDose,
-            min: 0,
-            max: 100,
-            divisions: 20,
-            label: _insulinDose.round().toString(),
-            onChanged: (double value) {
-              setState(() {
-                _insulinDose = value;
-              });
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.all(16),
-            child:
-                Text('Dosis de Insulina: ${_insulinDose.round().toString()}ml'),
-          ),
-          FloatingActionButton.extended(
-            onPressed: () async {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Home()));
-            },
-            backgroundColor: const Color(0xFF03DAC6),
-            label: const Text('Nuevo Diagnostico'),
-            icon: const Icon(Icons.add),
-            extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-          )
-        ],
-      ),
+    return Column(
+      children: [
+        Slider(
+          value: _insulinDose,
+          min: 0,
+          max: 100,
+          divisions: 20,
+          label: _insulinDose.round().toString(),
+          onChanged: (double value) {
+            setState(() {
+              _insulinDose = value;
+              widget.treatmentDetails["insulinDose"] = _insulinDose;
+            });
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text('Insulin Dose: ${_insulinDose.round().toString()} ml'),
+        ),
+      ],
     );
   }
+}
+
+// Función para guardar el tratamiento en la base de datos
+Future<void> saveTreatment(
+    int treatmentId, Map<String, dynamic> treatmentDetails) async {
+  print(treatmentId);
+  print(treatmentDetails);
 }

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/Diagnosis.dart';
-import 'package:medi_pro_vision/Models/user.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
@@ -231,7 +230,9 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const sendTreatment()));
+                                                  const SendTreatment(
+                                                    treatmentId: 1,
+                                                  )));
                                     });
                                   }
                                 });
