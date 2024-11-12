@@ -1,12 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/medicineController.dart';
 import 'package:medi_pro_vision/Models/Medicamentos.dart';
+import 'package:medi_pro_vision/Models/detailTreatment.dart';
 import 'package:medi_pro_vision/Widgets/botones.dart';
+import 'package:medi_pro_vision/Widgets/textBox.dart';
 
 class SendTreatment extends StatelessWidget {
-  final int treatmentId; // Recibe el ID del tratamiento
+  final int treatmentId;
 
   const SendTreatment({Key? key, required this.treatmentId}) : super(key: key);
 
@@ -21,7 +21,7 @@ class SendTreatment extends StatelessWidget {
 }
 
 class TreatmentSelectionPage extends StatefulWidget {
-  final int treatmentId; // Usado para mandar a la base de datos
+  final int treatmentId;
 
   const TreatmentSelectionPage({Key? key, required this.treatmentId})
       : super(key: key);
@@ -143,7 +143,7 @@ class MedicationPageContent extends StatefulWidget {
 
 class _MedicationPageContentState extends State<MedicationPageContent> {
   late Future<List<Medicine>> medications;
-  List<Medicine> selectedMedications = [];
+  List<SelectedMedication> selectedMedications = [];
 
   @override
   void initState() {
@@ -151,15 +151,82 @@ class _MedicationPageContentState extends State<MedicationPageContent> {
     medications = listMedicine();
   }
 
-  void toggleSelection(Medicine medicine, bool isSelected) {
-    setState(() {
-      if (isSelected) {
-        selectedMedications.add(medicine);
-      } else {
-        selectedMedications.remove(medicine);
-      }
-      widget.treatmentDetails["medication"] = selectedMedications;
-    });
+  void addMedicationDetails(Medicine medicine) async {
+    String dosis = medicine.presentation;
+    String? frecuencia;
+    DateTime? fechaFin;
+    TextEditingController frequency = TextEditingController();
+    TextEditingController endDate = TextEditingController();
+    List<String> medicationFrequency = [
+      "Once a day",
+      "Twice a day",
+      "Three times a day",
+      "Four times a day",
+      "Every 4 hours",
+      "Every 2 hours",
+      "Once a week",
+      "Every two weeks",
+      "Once a month"
+    ];
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter Details for ${medicine.tradeName}'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              selectFormText(
+                messageError: "Select any options",
+                labelText: "Frequency",
+                control: frequency,
+                options: medicationFrequency,
+              ),
+              formDate(
+                "Select any date",
+                "Date end dosis",
+                "End date",
+                const Icon(Icons.calendar_month),
+                endDate,
+                context,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                frecuencia = frequency.text.toString();
+                fechaFin = DateTime.tryParse(endDate.text);
+                if (frecuencia != null && fechaFin != null) {
+                  setState(() {
+                    selectedMedications
+                        .removeWhere((med) => med.idMedicina == medicine.id);
+                    selectedMedications.add(SelectedMedication(
+                      idMedicina: medicine.id,
+                      dosis: dosis,
+                      frecuencia: frecuencia!,
+                      fechaInicio: DateTime.now(),
+                      fechaFin: fechaFin!,
+                    ));
+
+                    // Actualizar el JSON en treatmentDetails
+                    widget.treatmentDetails["medication"] =
+                        selectedMedications.map((med) => med.toJson()).toList();
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -181,15 +248,16 @@ class _MedicationPageContentState extends State<MedicationPageContent> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 Medicine medicine = snapshot.data![index];
-                bool isSelected = selectedMedications.contains(medicine);
+                bool isSelected = selectedMedications
+                    .any((med) => med.idMedicina == medicine.id);
                 return ListTile(
                   title: Text(medicine.tradeName),
                   subtitle: Text(medicine.genericName + medicine.presentation),
-                  trailing: Checkbox(
-                    value: isSelected,
-                    onChanged: (bool? value) {
-                      toggleSelection(medicine, value ?? false);
-                    },
+                  trailing: IconButton(
+                    icon: Icon(isSelected
+                        ? Icons.check_box
+                        : Icons.check_box_outline_blank),
+                    onPressed: () => addMedicationDetails(medicine),
                   ),
                 );
               },
@@ -333,9 +401,8 @@ class _InsulinPageContentState extends State<InsulinPageContent> {
   }
 }
 
-// Función para guardar el tratamiento en la base de datos
 Future<void> saveTreatment(
     int treatmentId, Map<String, dynamic> treatmentDetails) async {
   print(treatmentId);
-  print(treatmentDetails);
+  print(treatmentDetails.toString());
 }

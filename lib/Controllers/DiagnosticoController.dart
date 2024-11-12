@@ -39,6 +39,19 @@ Future<HttpBaseResponse> guardarDiagnostico(
   }
 }
 
+void guardarTratamiento(
+    int idPatient, String diagnostico, String idUser) async {
+  try {
+    final response = await api.post('/newTreatment', {
+      "diagnostico": diagnostico,
+      "detail": idUser,
+    });
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body);
+    }
+  } on Exception {}
+}
+
 Future<String> listarDiagnosticos(String idUser) async {
   try {
     final response = await api.post('/findHistory', {"idUser": idUser});
