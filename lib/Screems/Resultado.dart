@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
 import 'package:medi_pro_vision/Models/Diagnosis.dart';
+import 'package:medi_pro_vision/Models/user.dart';
 import 'package:medi_pro_vision/Models/user1.dart';
 import 'package:medi_pro_vision/Screems/SendDiagnosis.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
@@ -63,17 +64,22 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
     prom = calcularProbabilidadDiabetes(widget.answer, pedigree);
   }
 
-  Future<int> sendDiagnosis(BuildContext context) async {
+  Future<HttpBaseResponse> sendDiagnosis(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dataUser = prefs.getString('user');
     if (dataUser != null) {
       Map<String, dynamic> userMap = jsonDecode(dataUser);
       user = User.fromJson(userMap);
     }
-    /*final response =
+
+    final response =
         await guardarDiagnostico(us.id, "Diabetico", user.id.toString());
-    return response;*/
-    return 2;
+    if (response.code == 2 && response.data != null) {
+      return response;
+    } else {
+      throw Exception(
+          "Error al registrar diagnóstico o datos nulos en la respuesta.");
+    }
   }
 
   Future<void> userCharge() async {
@@ -217,23 +223,25 @@ class _DiabetesRiskScreemState extends State<DiabetesRiskScreen> {
                               buttonText: "Positive diabetic",
                               onPressed: () {
                                 sendDiagnosis(context).then((value) {
-                                  if (value == 1) {
+                                  if (value.code == 1) {
                                     showDialogAlert(context, "Error",
                                         "Error when entering diagnosis");
                                   } else {
                                     showDialogAlertAndRedirection(
-                                        context,
-                                        "Succesfully",
-                                        "Diagnosis entered correctly",
-                                        onPressed: () {
-                                      Navigator.push(
+                                      context,
+                                      "Successfully",
+                                      "Diagnosis entered correctly",
+                                      onPressed: () {
+                                        Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SendTreatment(
-                                                    treatmentId: 1,
-                                                  )));
-                                    });
+                                            builder: (context) => SendTreatment(
+                                                treatmentId:
+                                                    int.parse(value.data)),
+                                          ),
+                                        );
+                                      },
+                                    );
                                   }
                                 });
                               }),

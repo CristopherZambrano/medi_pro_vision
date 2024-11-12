@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:medi_pro_vision/Global/api_interceptors.dart';
+import 'package:medi_pro_vision/Models/detailTreatment.dart';
 import 'package:medi_pro_vision/Models/user.dart';
 
 final ApiInterceptor api = ApiInterceptor();
@@ -39,17 +41,55 @@ Future<HttpBaseResponse> guardarDiagnostico(
   }
 }
 
-void guardarTratamiento(
-    int idPatient, String diagnostico, String idUser) async {
+void guardarTratamiento(int idDiagnosis, Map<String, dynamic> detalle) async {
   try {
-    final response = await api.post('/newTreatment', {
-      "diagnostico": diagnostico,
-      "detail": idUser,
-    });
-    if (response.statusCode == 200) {
-      final decodedData = jsonDecode(response.body);
+    bool esFarmacologico =
+        detalle['medication'].isNotEmpty || detalle['insulinDose'] > 0;
+    DateTime? ultimaFechaFin;
+    if (detalle['medication'].isNotEmpty) {
+      ultimaFechaFin = detalle['medication']
+          .map((med) => DateTime.parse(med['fecha_fin']))
+          .reduce((fecha1, fecha2) => fecha1.isAfter(fecha2) ? fecha1 : fecha2);
     }
-  } on Exception {}
+    final tratamientoData = {
+      "idDiagnosis": idDiagnosis.toString(),
+      if (ultimaFechaFin != null)
+        "fechaFin": DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(ultimaFechaFin),
+      "farmacologico": esFarmacologico.toString(),
+    };
+    final tratamientoResponse =
+        await api.post('/newTreatment', tratamientoData);
+    if (tratamientoResponse.statusCode == 200) {
+      final decodedData = jsonDecode(tratamientoResponse.body);
+      int idTreatment = int.parse(decodedData['id']);
+      if (esFarmacologico) {
+        for (var med in detalle['medication']) {
+          final medicamentoData = {
+            "idTreatment": idTreatment.toString(),
+            "idMedicine": med['id_medicina'],
+            "dosis": med['dosis'],
+            "frecuencia": med['frecuencia'],
+            "startDate": med['fecha_inicio'],
+            "endDate": med['fecha_fin'],
+          };
+          final medicamentoResponse =
+              await api.post('/detailTreatment', medicamentoData);
+          if (medicamentoResponse.statusCode != 200) {
+            print(
+                "Error al guardar el medicamento: ${medicamentoResponse.statusCode}");
+          }
+        }
+      }
+      print("Tratamiento guardado con éxito.");
+    } else {
+      print(
+          "Error al guardar el tratamiento: ${tratamientoResponse.statusCode}");
+      throw Exception(
+          "Error en la solicitud de tratamiento: ${tratamientoResponse.statusCode}");
+    }
+  } catch (e) {
+    print("Ocurrió un error al guardar el tratamiento: $e");
+  }
 }
 
 Future<String> listarDiagnosticos(String idUser) async {

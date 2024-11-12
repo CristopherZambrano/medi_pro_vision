@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
+import 'dart:convert';
 import 'package:medi_pro_vision/Controllers/medicineController.dart';
 import 'package:medi_pro_vision/Models/Medicamentos.dart';
 import 'package:medi_pro_vision/Models/detailTreatment.dart';
+import 'package:medi_pro_vision/Screems/home.dart';
 import 'package:medi_pro_vision/Widgets/botones.dart';
+import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/textBox.dart';
 
 class SendTreatment extends StatelessWidget {
@@ -105,7 +109,7 @@ class _TreatmentSelectionPageState extends State<TreatmentSelectionPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          await saveTreatment(widget.treatmentId, treatmentDetails);
+          await saveTreatment(widget.treatmentId, treatmentDetails, context);
         },
         backgroundColor: const Color(0xFF03DAC6),
         label: const Text('Save Treatment'),
@@ -401,8 +405,13 @@ class _InsulinPageContentState extends State<InsulinPageContent> {
   }
 }
 
-Future<void> saveTreatment(
-    int treatmentId, Map<String, dynamic> treatmentDetails) async {
-  print(treatmentId);
-  print(treatmentDetails.toString());
+Future<dynamic> saveTreatment(int treatmentId,
+    Map<String, dynamic> treatmentDetails, BuildContext context) async {
+  guardarTratamiento(treatmentId, treatmentDetails);
+  showDialogAlertAndRedirection(
+      context, "Treatment registered", "Treatment registered succesfully",
+      onPressed: () {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const Home()));
+  });
 }
