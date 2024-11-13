@@ -241,7 +241,7 @@ class _FormRegisterState extends State<FormRegister> {
                           buttonText: "Register",
                           onPressed: () {
                             if (_doctorFormKey.currentState!.validate()) {
-                              register(false).then((value) {
+                              register(true).then((value) {
                                 if (value == true) {
                                   showDialogAlertAndRedirection(
                                       context, 'Registered doctor', message,

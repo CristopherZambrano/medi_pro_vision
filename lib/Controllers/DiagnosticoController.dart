@@ -60,18 +60,22 @@ void guardarTratamiento(int idDiagnosis, Map<String, dynamic> detalle) async {
     final tratamientoResponse =
         await api.post('/newTreatment', tratamientoData);
     if (tratamientoResponse.statusCode == 200) {
+      print("Aqui llego");
       final decodedData = jsonDecode(tratamientoResponse.body);
-      int idTreatment = int.parse(decodedData['id']);
+      print(decodedData);
+      int idTreatment = int.parse(decodedData['id'].toString());
       if (esFarmacologico) {
         for (var med in detalle['medication']) {
+          print(med.toString());
           final medicamentoData = {
             "idTreatment": idTreatment.toString(),
-            "idMedicine": med['id_medicina'],
-            "dosis": med['dosis'],
-            "frecuencia": med['frecuencia'],
-            "startDate": med['fecha_inicio'],
-            "endDate": med['fecha_fin'],
+            "idMedicine": med['id_medicina'].toString(),
+            "dosis": med['dosis'].toString(),
+            "frecuencia": med['frecuencia'].toString(),
+            "startDate": med['fecha_inicio'].toString(),
+            "endDate": med['fecha_fin'].toString(),
           };
+          print(medicamentoData);
           final medicamentoResponse =
               await api.post('/detailTreatment', medicamentoData);
           if (medicamentoResponse.statusCode != 200) {

@@ -88,7 +88,10 @@ class _TreatmentSelectionPageState extends State<TreatmentSelectionPage> {
               ),
             ),
             if (_showMedicationDetails)
-              MedicationPageContent(treatmentDetails: treatmentDetails),
+              MedicationPageContent(
+                treatmentDetails: treatmentDetails,
+                iddiagnostico: widget.treatmentId,
+              ),
             ListTile(
               title: const Text('Insulin Injections'),
               trailing: IconButton(
@@ -136,9 +139,11 @@ class DietPageContent extends StatelessWidget {
 }
 
 class MedicationPageContent extends StatefulWidget {
+  final int iddiagnostico;
   final Map<String, dynamic> treatmentDetails;
 
-  const MedicationPageContent({Key? key, required this.treatmentDetails})
+  const MedicationPageContent(
+      {Key? key, required this.treatmentDetails, required this.iddiagnostico})
       : super(key: key);
 
   @override
@@ -333,7 +338,7 @@ class _MedicationPageContentState extends State<MedicationPageContent> {
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop();
+                                Navigator.pop(context);
                               },
                               child: const Text('Cancel'),
                             ),
@@ -349,10 +354,12 @@ class _MedicationPageContentState extends State<MedicationPageContent> {
                                       presentation:
                                           "$presentation${concentration}MG");
                                   saveMedicine(med);
-                                  MaterialPageRoute(
-                                      builder: (context) => const SendTreatment(
-                                            treatmentId: 1,
-                                          ));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (contex) => SendTreatment(
+                                            treatmentId: widget.iddiagnostico)),
+                                  );
                                 }
                               },
                               child: const Text('Save'),
