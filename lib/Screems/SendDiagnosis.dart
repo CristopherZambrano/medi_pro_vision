@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medi_pro_vision/Controllers/DiagnosticoController.dart';
-import 'dart:convert';
 import 'package:medi_pro_vision/Controllers/medicineController.dart';
 import 'package:medi_pro_vision/Models/Medicamentos.dart';
 import 'package:medi_pro_vision/Models/detailTreatment.dart';
 import 'package:medi_pro_vision/Screems/home.dart';
-import 'package:medi_pro_vision/Widgets/botones.dart';
 import 'package:medi_pro_vision/Widgets/dialogs.dart';
 import 'package:medi_pro_vision/Widgets/textBox.dart';
 
@@ -274,101 +272,6 @@ class _MedicationPageContentState extends State<MedicationPageContent> {
           }
         },
       ),
-      Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FractionallySizedBox(
-            widthFactor: 0.75,
-            child: primaryButton(
-                buttonText: "Add medication",
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext contex) {
-                        String tradeName = '';
-                        String genericName = '';
-                        String presentation = 'Tablets'; // Valor inicial
-                        double concentration = 0;
-
-                        return AlertDialog(
-                          title: const Text('Add Medication'),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                TextField(
-                                  decoration: const InputDecoration(
-                                      labelText: 'Trade name'),
-                                  onChanged: (value) {
-                                    tradeName = value;
-                                  },
-                                ),
-                                TextField(
-                                  decoration: const InputDecoration(
-                                      labelText: 'Generic name'),
-                                  onChanged: (value) {
-                                    genericName = value;
-                                  },
-                                ),
-                                DropdownButtonFormField<String>(
-                                  value: presentation,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Presentation'),
-                                  onChanged: (String? newValue) {
-                                    presentation = newValue!;
-                                  },
-                                  items: ['Tablets', 'Syrup', 'Injection']
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                ),
-                                TextField(
-                                  decoration: const InputDecoration(
-                                      labelText: 'Concentration (MG)'),
-                                  keyboardType: TextInputType.number,
-                                  onChanged: (value) {
-                                    concentration = double.tryParse(value) ?? 0;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                if (tradeName.isNotEmpty &&
-                                    genericName.isNotEmpty &&
-                                    concentration > 0) {
-                                  Medicine med = Medicine(
-                                      id: 0,
-                                      tradeName: tradeName,
-                                      genericName: genericName,
-                                      presentation:
-                                          "$presentation${concentration}MG");
-                                  saveMedicine(med);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (contex) => SendTreatment(
-                                            treatmentId: widget.iddiagnostico)),
-                                  );
-                                }
-                              },
-                              child: const Text('Save'),
-                            ),
-                          ],
-                        );
-                      });
-                }),
-          ))
     ]);
   }
 }

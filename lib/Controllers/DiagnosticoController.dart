@@ -123,3 +123,17 @@ Future<HttpBaseResponse> DoctorName(String idUser) async {
     return HttpBaseResponse(code: 1, message: "Error en la data", data: null);
   }
 }
+
+Future<Map<String, dynamic>> treatmentsDetails(String idUser) async {
+  try {
+    final response = await api.post('/getDetailTreatment', {"idUser": idUser});
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body);
+      return decodedData;
+    } else {
+      return {'Error': 'Error en la data'};
+    }
+  } on Exception {
+    return {'Error': 'Error en la data'};
+  }
+}
